@@ -13,7 +13,6 @@ const Login = () => {
       const res = await axios.post("http://localhost:8000/api/login", { email, password });
       
       if (res.data.success) {
-        // STORE THE TOKEN
         localStorage.setItem("token", res.data.token); 
         localStorage.setItem("userId", res.data.userId);
         localStorage.setItem("companyId", res.data.companyId);
@@ -31,8 +30,14 @@ const Login = () => {
     <div className="d-flex justify-content-center align-items-center vh-100" 
          style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
       <div className="card border-0 shadow-lg" style={{ width: "400px", borderRadius: "16px", background: "rgba(255, 255, 255, 0.95)" }}>
-        <div className="card-body p-5">
-          <div className="text-center mb-4">
+        <div className="card-body p-5 position-relative">
+          
+          {/* BACK TO HOME LINK */}
+          <div className="position-absolute top-0 start-0 p-4">
+            <Link to="/" className="text-decoration-none text-muted small fw-bold">← Home</Link>
+          </div>
+
+          <div className="text-center mb-4 mt-3">
             <h3 className="fw-bold text-dark mb-1">Welcome Back</h3>
             <p className="text-muted small">Log in to manage your team</p>
           </div>
