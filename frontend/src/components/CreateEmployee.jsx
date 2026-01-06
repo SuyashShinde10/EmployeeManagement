@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+// 1. Use your new api instance
+import api from "../utils/api"; 
 import { toast } from "react-toastify";
 
 const CreateEmployee = () => {
@@ -13,15 +14,15 @@ const CreateEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const companyId = localStorage.getItem("companyId");
-    const token = localStorage.getItem("token"); // GET TOKEN
+    // Token is now handled automatically by api.js
 
     try {
-      await axios.post("http://localhost:8000/api/create-employee", {
+      // 2. Simplified API call
+      await api.post("/create-employee", {
         ...formData,
         hrCompanyId: companyId
-      }, {
-        headers: { Authorization: `Bearer ${token}` } // 🔒 SECURE HEADER
       });
+      
       toast.success("Employee Added!");
       setFormData({ name: "", email: "", password: "", team: "General" });
     } catch (err) {
