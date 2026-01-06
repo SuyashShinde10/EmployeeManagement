@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
+require('dotenv').config(); // 1. Load the .env file
 
-// Connect to local MongoDB or Atlas
-mongoose.connect('mongodb://localhost:27017/teamsync')
+// 2. Use process.env.MONGO_URI instead of the hardcoded string
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log('DB Connected Successfully');
+    console.log('✅ DB Connected Successfully');
   })
   .catch((err) => {
-    console.log(err);
+    console.error('❌ DB Connection Error:', err);
   });
