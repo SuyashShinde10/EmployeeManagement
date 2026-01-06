@@ -9,26 +9,34 @@ const TaskDetails = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
 
   const [task, setTask] = useState(null);
   const [newComment, setNewComment] = useState("");
 
   const fetchTask = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/task/${id}`);
+      const res = await axios.get(`http://localhost:8000/api/task/${id}`, {
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       setTask(res.data);
     } catch (err) {
       toast.error("Failed to load task");
     }
   };
 
-  useEffect(() => { fetchTask(); }, [id]);
+  useEffect(() => { 
+    if(token) fetchTask(); 
+  }, [id, token]);
 
   const handleComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      await axios.post(`http://localhost:8000/api/task/comment/${id}`, { userId, text: newComment });
+      await axios.post(`http://localhost:8000/api/task/comment/${id}`, 
+        { userId, text: newComment },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setNewComment("");
       fetchTask();
       toast.success("Posted");
@@ -37,12 +45,14 @@ const TaskDetails = () => {
 
   const updateStatus = async (newStatus) => {
     try {
-      // SEND USER ID SO BACKEND KNOWS WHO CLICKED
-      await axios.put("http://localhost:8000/api/task/status", { 
-        taskId: id, 
-        status: newStatus,
-        userId: userId 
-      });
+      await axios.put("http://localhost:8000/api/task/status", 
+        { 
+          taskId: id, 
+          status: newStatus,
+          userId: userId
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       
       if(newStatus === 'Completed') toast.success("You marked this as done!");
       else toast.success("Task Started");
@@ -56,9 +66,19 @@ const TaskDetails = () => {
   if (!task) return <div className="p-5 text-center">Loading...</div>;
 
   const isAssignedToMe = task.assignedTo.some(u => u._id === userId);
-  
-  // Check if I specifically have finished it
   const haveIFinished = task.completedBy ? task.completedBy.some(u => u._id === userId) : false;
+
+  // --- NEW EXPIRED LOGIC ---
+  const isExpired = task.status !== 'Completed' && new Date() > new Date(task.deadline);
+  let displayStatus = task.status;
+  let statusBadge = "bg-secondary";
+
+  if (task.status === 'Completed') statusBadge = "bg-success";
+  else if (isExpired) {
+      displayStatus = "Expired";
+      statusBadge = "bg-danger";
+  } else if (task.status === 'In Progress') statusBadge = "bg-warning text-dark";
+
 
   return (
     <>
@@ -71,7 +91,6 @@ const TaskDetails = () => {
                 ← Back to Board
             </button>
 
-            {/* ACTION BUTTONS */}
             {role === 'Employee' && isAssignedToMe && (
                 <div>
                     {task.status === 'Assigned' && (
@@ -80,14 +99,12 @@ const TaskDetails = () => {
                         </button>
                     )}
                     
-                    {/* Only show 'Mark Completed' if Task isn't globally done AND I haven't finished my part */}
                     {task.status === 'In Progress' && !haveIFinished && (
                         <button className="btn btn-success fw-bold px-4" onClick={() => updateStatus('Completed')}>
                             ✅ Mark My Part as Done
                         </button>
                     )}
 
-                    {/* If I finished but others haven't */}
                     {task.status === 'In Progress' && haveIFinished && (
                         <button className="btn btn-outline-secondary fw-bold px-4" disabled>
                             ⏳ Waiting for team...
@@ -104,8 +121,8 @@ const TaskDetails = () => {
             <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
               <div className="d-flex justify-content-between align-items-start">
                 <h2 className="fw-bold mb-3">{task.title}</h2>
-                <span className={`badge px-3 py-2 rounded-pill ${task.status === 'Completed' ? 'bg-success' : task.status === 'In Progress' ? 'bg-warning text-dark' : 'bg-secondary'}`}>
-                    {task.status}
+                <span className={`badge px-3 py-2 rounded-pill ${statusBadge}`}>
+                    {displayStatus}
                 </span>
               </div>
               <p className="text-muted lh-lg" style={{whiteSpace: 'pre-wrap'}}>{task.description}</p>
@@ -114,7 +131,6 @@ const TaskDetails = () => {
                 <label className="text-uppercase small text-muted fw-bold mb-2">Assignees</label>
                 <div className="d-flex flex-wrap gap-2">
                   {task.assignedTo.map(u => {
-                      // Check if this specific user finished
                       const userDone = task.completedBy.some(c => c._id === u._id);
                       return (
                         <div key={u._id} className={`badge px-3 py-2 rounded-pill fw-normal ${userDone ? 'bg-success text-white' : 'bg-primary bg-opacity-10 text-primary'}`}>
@@ -126,7 +142,7 @@ const TaskDetails = () => {
               </div>
             </div>
 
-            {/* Chat UI - HIDDEN FOR HR */}
+            {/* Chat UI */}
             {role !== 'HR' && (
                 <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div className="card-header bg-white p-4 border-bottom">
@@ -175,14 +191,13 @@ const TaskDetails = () => {
               <h6 className="text-uppercase small text-muted fw-bold mb-3">Timeline</h6>
               <div className="mb-3">
                 <span className="d-block small text-muted">Deadline</span>
-                <span className="fw-bold text-danger">{new Date(task.deadline).toLocaleDateString()}</span>
+                <span className={`fw-bold ${isExpired ? 'text-danger' : 'text-dark'}`}>{new Date(task.deadline).toLocaleDateString()}</span>
               </div>
               <div className="mb-3">
                 <span className="d-block small text-muted">Created</span>
                 <span className="fw-bold text-dark">{new Date(task.createdAt).toLocaleDateString()}</span>
               </div>
               
-              {/* Progress Bar for Team */}
               <div className="mt-4">
                  <span className="d-block small text-muted mb-1">Team Progress</span>
                  <div className="progress" style={{height: '8px'}}>
