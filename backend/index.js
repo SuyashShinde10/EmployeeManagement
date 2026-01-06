@@ -35,7 +35,7 @@ app.use('/api', require('./route/authRoute'));
 app.use('/api', require('./route/taskRoute'));
 
 // If you have an employee route, ensure the filename matches exactly (e.g., employeeRoute.js)
-app.use('/api', require('./route/employeeRoute')); 
+// app.use('/api', require('./route/employeeRoute')); 
 
 app.get("/", (req, res) => {
   res.json({ 
