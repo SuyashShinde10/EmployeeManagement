@@ -1,17 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
-// On Vercel, env variables are injected automatically. 
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
+require('dotenv').config();
 
 const app = express();
 
-// 1. CORS MIDDLEWARE (Must be first)
+// 1. CORS CONFIGURATION
 app.use(cors({
-  origin: "*",
+  origin: "*", // Allow all origins for development
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: false
 }));
@@ -21,28 +17,28 @@ app.use(express.json());
 // 2. DATABASE CONNECTION
 const mongoURI = process.env.MONGO_URI;
 
-if (!mongoURI) {
-    console.error("❌ ERROR: MONGO_URI is undefined. Check Vercel Environment Variables.");
-} else {
-    mongoose.connect(mongoURI)
-      .then(() => console.log('✅ DB Connected')) // Your logs show this is now working!
-      .catch((err) => console.error('❌ DB Connection Error:', err.message));
-}
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ DB Connected Successfully'))
+  .catch((err) => console.error('❌ DB Connection Error:', err.message));
 
-// 3. ROUTES 
-// Updated to match your exact folder "route" and filenames from your screenshot
+// 3. ROUTES
+// Ensure these files exist in a 'route' folder
 app.use('/api', require('./route/authRoute')); 
 app.use('/api', require('./route/taskRoute'));
 
-// If you have an employee route, ensure the filename matches exactly (e.g., employeeRoute.js)
-// app.use('/api', require('./route/employeeRoute')); 
-
+// Test Route
 app.get("/", (req, res) => {
-  res.json({ 
-    status: "Backend Online", 
-    database: mongoose.connection.readyState === 1 ? "Connected" : "Disconnected" 
-  });
+  res.json({ status: "Backend Online", message: "Welcome to the API" });
 });
 
-// 4. EXPORT FOR VERCEL
+// 4. SERVER STARTUP (The Missing Piece!)
+// This allows the app to run locally on port 8000 AND export for Vercel
+const PORT = process.env.PORT || 8000;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running locally on http://localhost:${PORT}`);
+  });
+}
+
 module.exports = app;

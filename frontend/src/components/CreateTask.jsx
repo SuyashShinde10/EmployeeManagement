@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../utils/api"; // Updated import
 import { toast } from "react-toastify";
 
 const CreateTask = ({ refreshTasks }) => {
@@ -9,9 +9,9 @@ const CreateTask = ({ refreshTasks }) => {
     deadline: "" 
   });
 
-  // Helper: Get current local date-time string (YYYY-MM-DDTHH:MM)
   const getMinDateTime = () => {
     const now = new Date();
+    // (Your existing date helper logic remains the same)
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -23,22 +23,20 @@ const CreateTask = ({ refreshTasks }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // VALIDATION: Check if date is in the past
     if (new Date(task.deadline) < new Date()) {
         toast.warning("Deadline cannot be in the past!");
         return;
     }
 
     const companyId = localStorage.getItem("companyId");
-    const token = localStorage.getItem("token");
 
     try {
-      await axios.post("http://localhost:8000/api/task/create", {
+      // Simplified API call without headers
+      await api.post("/task/create", {
         ...task,
         companyId
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
+
       toast.success("Task Created!");
       setTask({ title: "", description: "", deadline: "" });
       
@@ -86,7 +84,7 @@ const CreateTask = ({ refreshTasks }) => {
               value={task.deadline}
               onChange={(e) => setTask({...task, deadline: e.target.value})}
               required
-              min={getMinDateTime()} // BLOCKS PAST DATES IN CALENDAR
+              min={getMinDateTime()} 
               style={{fontSize: '0.85rem'}}
             />
           </div>

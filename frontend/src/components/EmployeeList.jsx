@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api"; // Updated import
 import { toast } from "react-toastify";
 import EditEmployeeModal from "./EditEmployeeModal";
 
@@ -10,30 +10,27 @@ const EmployeeList = ({ refreshTrigger }) => {
   const [activeTab, setActiveTab] = useState('active'); 
   const [internalRefresh, setInternalRefresh] = useState(0);
 
-  // GET TOKEN
-  const token = localStorage.getItem("token");
-
   useEffect(() => {
     const fetchEmployees = async () => {
       const companyId = localStorage.getItem("companyId");
+      if (!companyId) return; // Guard clause
+
       try {
-        const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=&includeResigned=true`, {
-            headers: { Authorization: `Bearer ${token}` } // 🔒 SECURE HEADER
-        });
+        // Cleaner URL params
+        const res = await api.get(`/employees/search?companyId=${companyId}&query=&includeResigned=true`);
         setEmployees(res.data);
       } catch (err) { 
         console.error(err);
       }
     };
-    if(token) fetchEmployees();
-  }, [refreshTrigger, internalRefresh, token]);
+    fetchEmployees();
+  }, [refreshTrigger, internalRefresh]);
 
   const handleDelete = async (id) => {
     if (window.confirm("Archive this employee?")) {
         try {
-            await axios.put(`http://localhost:8000/api/employee/delete/${id}`, {}, {
-                headers: { Authorization: `Bearer ${token}` } // 🔒 SECURE HEADER
-            });
+            // Simplified PUT call
+            await api.put(`/employee/delete/${id}`, {});
             toast.info("Archived");
             setInternalRefresh(prev => prev + 1);
         } catch (err) { toast.error("Failed"); }

@@ -10,15 +10,14 @@ const {
   updateProfile
 } = require('../controller/authController');
 
+// Public Routes
 router.post('/register-company', registerCompany);
 router.post('/login', login);
-router.post('/create-employee', createEmployee);
 
-// Employee Management Routes
+// Note: Ensure your frontend sends the Token for these if you want them protected later
+router.post('/create-employee', createEmployee); 
 router.put('/employee/edit/:id', editEmployee);
 router.put('/employee/delete/:id', deleteEmployee);
-
-// Profile Route
 router.put('/user/profile/:id', updateProfile);
 
 module.exports = router;

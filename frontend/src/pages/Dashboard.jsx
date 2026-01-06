@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// 1. Remove standard axios import
+// import axios from 'axios'; 
+// 2. Import your new custom instance
+import api from '../utils/api'; 
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DashboardStats from '../components/DashboardStats';
@@ -14,7 +17,7 @@ const Dashboard = () => {
   const role = localStorage.getItem("role");
   const companyId = localStorage.getItem("companyId");
   const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token"); // GET TOKEN
+  // const token = localStorage.getItem("token"); // Token is now handled automatically by api.js
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [tasks, setTasks] = useState([]); 
@@ -23,9 +26,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/tasks/${companyId}`, {
-           headers: { Authorization: `Bearer ${token}` } // SEND TOKEN
-        });
+        // 3. SIMPLIFIED CALL:
+        // - No "http://localhost:8000/api" (api.js handles baseURL)
+        // - No "headers: { Authorization... }" (api.js handles token)
+        const res = await api.get(`/tasks/${companyId}`);
         setTasks(res.data);
       } catch (err) {
         if (err.response && err.response.status === 401) {
@@ -34,8 +38,10 @@ const Dashboard = () => {
         }
       }
     };
-    if (companyId && token) fetchTasks();
-  }, [refreshTrigger, companyId, token, navigate]);
+    
+    // 4. Ensure companyId exists before calling
+    if (companyId) fetchTasks();
+  }, [refreshTrigger, companyId, navigate]);
 
   const refreshData = () => setRefreshTrigger(prev => prev + 1);
 
@@ -62,6 +68,7 @@ const Dashboard = () => {
               <CreateTask refreshTasks={refreshData} />
             </div>
             <div className="col-lg-8">
+              {/* Note: You might need to update EmployeeList to use 'api' as well */}
               <EmployeeList refreshTrigger={refreshTrigger} />
             </div>
           </div>
