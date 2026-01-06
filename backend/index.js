@@ -1,31 +1,39 @@
-require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // Import CORS
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
 const app = express();
 
-// Connect to Database
-require('./config/db');
+// 1. ALLOW CORS FROM ANYWHERE (Crucial for Vercel deployment)
+app.use(cors({
+  origin: "*", 
+  credentials: true
+}));
 
-// Middleware
-app.use(express.json()); // Parses incoming JSON requests
-app.use(express.urlencoded({ extended: true }));
-app.use(cors()); // Allows React to talk to this Node server
+app.use(express.json());
 
-// Import Routes
-const authRoute = require('./route/authRoute');
-const taskRoute = require('./route/taskRoute');
+// Database Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ DB Connected'))
+  .catch((err) => console.error('❌ DB Error:', err));
 
-// Use Routes
-app.use('/api', authRoute); // Prefix routes with /api
-app.use('/api', taskRoute);
+// Routes
+// (Make sure your route paths match what you have)
+app.use('/api', require('./routes/authRoutes')); 
+app.use('/api', require('./routes/taskRoutes'));
+app.use('/api', require('./routes/employeeRoutes'));
 
-// Test Route
-app.get('/', (req, res) => {
-  res.send("TeamSync Server is Running...");
+app.get("/", (req, res) => {
+  res.json({ message: "TeamSync Backend is Running on Vercel!" });
 });
 
-// Start Server
+// 2. EXPORT FOR VERCEL (Instead of just listening)
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+if (require.main === module) {
+  // Only listen if running locally
+  app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+}
+
+module.exports = app;

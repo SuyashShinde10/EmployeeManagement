@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+// 1. IMPORT THE NEW HELPER instead of axios
+import api from "../api"; 
 import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
@@ -10,7 +11,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8000/api/login", { email, password });
+      // 2. USE 'api.post' AND REMOVE THE FULL URL
+      // The base URL is now handled automatically in api.js
+      const res = await api.post("/login", { email, password });
       
       if (res.data.success) {
         localStorage.setItem("token", res.data.token); 
@@ -32,7 +35,6 @@ const Login = () => {
       <div className="card border-0 shadow-lg" style={{ width: "400px", borderRadius: "16px", background: "rgba(255, 255, 255, 0.95)" }}>
         <div className="card-body p-5 position-relative">
           
-          {/* BACK TO HOME LINK */}
           <div className="position-absolute top-0 start-0 p-4">
             <Link to="/" className="text-decoration-none text-muted small fw-bold">← Home</Link>
           </div>
