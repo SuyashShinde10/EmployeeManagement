@@ -5,34 +5,32 @@ require('dotenv').config();
 
 const app = express();
 
-// 1. ALLOW CORS FROM ANYWHERE (Crucial for Vercel deployment)
+// --- FIX STARTS HERE ---
 app.use(cors({
-  origin: "*", 
+  // 1. Replace "*" with your ACTUAL Frontend URL (No trailing slash)
+  origin: ["https://employee-management-six-chi.vercel.app"], 
+  methods: ["POST", "GET", "PUT", "DELETE"],
   credentials: true
 }));
+// --- FIX ENDS HERE ---
 
 app.use(express.json());
 
-// Database Connection
+// ... (Rest of your database connection and routes remains the same)
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ DB Connected'))
   .catch((err) => console.error('❌ DB Error:', err));
 
-// Routes
-// (Make sure your route paths match what you have)
 app.use('/api', require('./routes/authRoutes')); 
 app.use('/api', require('./routes/taskRoutes'));
 app.use('/api', require('./routes/employeeRoutes'));
 
 app.get("/", (req, res) => {
-  res.json({ message: "TeamSync Backend is Running on Vercel!" });
+  res.json({ message: "TeamSync Backend is Running!" });
 });
 
-// 2. EXPORT FOR VERCEL (Instead of just listening)
 const PORT = process.env.PORT || 8000;
-
 if (require.main === module) {
-  // Only listen if running locally
   app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 }
 
