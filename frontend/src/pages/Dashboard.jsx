@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 // 1. Remove standard axios import
 // import axios from 'axios'; 
 // 2. Import your new custom instance
-import api from '../api';
+import api from "../api";
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DashboardStats from '../components/DashboardStats';
