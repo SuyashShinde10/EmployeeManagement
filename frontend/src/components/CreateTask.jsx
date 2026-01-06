@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import api from "../utils/api"; // Updated import
+import api from "../api";// Updated import
 import { toast } from "react-toastify";
 
 const CreateTask = ({ refreshTasks }) => {
