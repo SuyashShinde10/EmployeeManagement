@@ -15,8 +15,13 @@ const EditTaskModal = ({ task, onClose, onUpdateSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token"); // GET TOKEN
+
     try {
-      await axios.put(`http://localhost:8000/api/task/edit/${task._id}`, formData);
+      await axios.put(`http://localhost:8000/api/task/edit/${task._id}`, 
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } } // 🔒 SECURE HEADER
+      );
       toast.success("Task Updated!");
       onUpdateSuccess();
       onClose();

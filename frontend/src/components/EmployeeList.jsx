@@ -10,21 +10,30 @@ const EmployeeList = ({ refreshTrigger }) => {
   const [activeTab, setActiveTab] = useState('active'); 
   const [internalRefresh, setInternalRefresh] = useState(0);
 
+  // GET TOKEN
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchEmployees = async () => {
       const companyId = localStorage.getItem("companyId");
       try {
-        const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=&includeResigned=true`);
+        const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=&includeResigned=true`, {
+            headers: { Authorization: `Bearer ${token}` } // 🔒 SECURE HEADER
+        });
         setEmployees(res.data);
-      } catch (err) { toast.error("Failed to load employees"); }
+      } catch (err) { 
+        console.error(err);
+      }
     };
-    fetchEmployees();
-  }, [refreshTrigger, internalRefresh]);
+    if(token) fetchEmployees();
+  }, [refreshTrigger, internalRefresh, token]);
 
   const handleDelete = async (id) => {
     if (window.confirm("Archive this employee?")) {
         try {
-            await axios.put(`http://localhost:8000/api/employee/delete/${id}`);
+            await axios.put(`http://localhost:8000/api/employee/delete/${id}`, {}, {
+                headers: { Authorization: `Bearer ${token}` } // 🔒 SECURE HEADER
+            });
             toast.info("Archived");
             setInternalRefresh(prev => prev + 1);
         } catch (err) { toast.error("Failed"); }

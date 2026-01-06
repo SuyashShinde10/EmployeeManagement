@@ -9,14 +9,35 @@ const CreateTask = ({ refreshTasks }) => {
     deadline: "" 
   });
 
+  // Helper: Get current local date-time string (YYYY-MM-DDTHH:MM)
+  const getMinDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // VALIDATION: Check if date is in the past
+    if (new Date(task.deadline) < new Date()) {
+        toast.warning("Deadline cannot be in the past!");
+        return;
+    }
+
     const companyId = localStorage.getItem("companyId");
+    const token = localStorage.getItem("token");
 
     try {
       await axios.post("http://localhost:8000/api/task/create", {
         ...task,
         companyId
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Task Created!");
       setTask({ title: "", description: "", deadline: "" });
@@ -65,6 +86,7 @@ const CreateTask = ({ refreshTasks }) => {
               value={task.deadline}
               onChange={(e) => setTask({...task, deadline: e.target.value})}
               required
+              min={getMinDateTime()} // BLOCKS PAST DATES IN CALENDAR
               style={{fontSize: '0.85rem'}}
             />
           </div>

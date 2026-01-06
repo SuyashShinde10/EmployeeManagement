@@ -8,14 +8,18 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [error, setError] = useState("");
 
-  // 1. ALWAYS Run Hooks (Do not put returns before this)
+  // 1. ALWAYS Run Hooks (Move safety checks AFTER hooks)
   useEffect(() => {
     const searchEmployees = async () => {
       const companyId = localStorage.getItem("companyId");
+      const token = localStorage.getItem("token"); // GET TOKEN
+      
       try {
-          // Only call API if we have a companyId (prevents 400 errors on empty state)
-          if(companyId) {
-             const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=${query}`);
+          // Only run if we have the token/companyId
+          if (companyId && token) {
+             const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=${query}`, {
+                headers: { Authorization: `Bearer ${token}` }
+             });
              setEmployees(res.data);
           }
       } catch (err) {
@@ -27,7 +31,7 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  // 2. Safety Check (Must be AFTER hooks)
+  // 2. Safety Check (MUST be placed AFTER all hooks)
   if (!task) return null;
 
   const toggleSelect = (id) => {
@@ -40,11 +44,15 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
 
   const handleAssign = async () => {
     const companyId = localStorage.getItem("companyId");
+    const token = localStorage.getItem("token");
+
     try {
       await axios.put("http://localhost:8000/api/task/assign", {
         taskId: task._id,
         employeeIds: selectedIds,
         companyId
+      }, {
+         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Assigned successfully!");
       onAssignSuccess();
