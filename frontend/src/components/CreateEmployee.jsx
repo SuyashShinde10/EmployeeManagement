@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // 1. Use your new api instance
-import api from "../utils/api"; 
+import api from "../api";
 import { toast } from "react-toastify";
 
 const CreateEmployee = () => {
