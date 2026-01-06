@@ -4,7 +4,7 @@ import axios from "axios";
 const api = axios.create({
   // VITE_API_URL will be set in Vercel Dashboard later.
   // For now, it defaults to localhost so your code still works on your computer.
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://employeemanagement-eta-seven.vercel.app/",
   headers: {
     "Content-Type": "application/json",
   },
