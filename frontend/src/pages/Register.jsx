@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+// 1. IMPORT THE HELPER (This handles the URL automatically)
+import api from "../api"; 
 import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
@@ -18,7 +19,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/api/register-company", formData);
+      // 2. USE 'api.post' AND REMOVE THE URL
+      // The api.js file automatically inserts the Vercel Backend URL
+      await api.post("/register-company", formData);
+      
       alert("Registration Successful! Please Login.");
       navigate("/login");
     } catch (err) {
@@ -33,7 +37,6 @@ const Register = () => {
       <div className="card border-0 shadow-lg" style={{ width: "450px", borderRadius: "16px", background: "rgba(255, 255, 255, 0.95)" }}>
         <div className="card-body p-5 position-relative">
           
-          {/* BACK TO HOME LINK */}
           <div className="position-absolute top-0 start-0 p-4">
              <Link to="/" className="text-decoration-none text-muted small fw-bold">← Home</Link>
           </div>
