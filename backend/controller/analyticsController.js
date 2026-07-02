@@ -1,4 +1,4 @@
-const Task = require('../model/Task');
+const Task = require('../model/task');
 const User = require('../model/user');
 
 // Helper to calculate date range
