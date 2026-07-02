@@ -275,19 +275,20 @@ const Analytics = () => {
                     <th style={{ padding: '12px 8px' }}>TASKS DONE</th>
                     <th style={{ padding: '12px 8px' }}>AVG. SPEED</th>
                     <th style={{ padding: '12px 8px' }}>ON-TIME RATE</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'right' }}>EFFICIENCY SCORE</th>
+                    <th style={{ padding: '12px 8px', textAlign: 'right' }}>TOTAL XP</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard.map((emp, index) => {
                     let scoreBadgeColor = 'var(--text-muted)';
                     let scoreBadgeBg = 'var(--surface-2)';
-                    if (emp.score >= 80) {
+                    const xpVal = emp.xp || emp.score || 0;
+                    if (xpVal >= 55) {
+                      scoreBadgeColor = 'var(--accent)';
+                      scoreBadgeBg = 'var(--accent-light)';
+                    } else if (xpVal >= 20) {
                       scoreBadgeColor = 'var(--success)';
                       scoreBadgeBg = 'var(--success-light)';
-                    } else if (emp.score >= 50) {
-                      scoreBadgeColor = 'var(--warning)';
-                      scoreBadgeBg = 'var(--warning-light)';
                     }
 
                     return (
@@ -334,7 +335,7 @@ const Analytics = () => {
                             color: scoreBadgeColor,
                             background: scoreBadgeBg
                           }}>
-                            {emp.score}/100
+                            {xpVal} XP
                           </span>
                         </td>
                       </tr>
@@ -387,6 +388,14 @@ const Analytics = () => {
                   On-Time Rate
                 </span>
                 <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '8px 0 0' }}>{summary.onTimeRate || 0}%</h2>
+              </div>
+              <div className="ts-surface" style={{ padding: 20, border: '1px solid var(--accent)', background: 'var(--accent-light)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Total XP Points
+                </span>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '8px 0 0', color: 'var(--accent)' }}>
+                  {summary.xp || 0} XP
+                </h2>
               </div>
             </div>
 

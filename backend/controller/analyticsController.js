@@ -115,20 +115,35 @@ exports.getPMAnalytics = async (req, res) => {
         t.completedBy.some(userId => userId.toString() === emp._id.toString())
       );
 
-      // Calculate on-time completions
+      // Calculate on-time completions & XP
       let onTimeCount = 0;
       let totalSpeedMs = 0;
+      let xp = 0;
 
       completedTasks.forEach(t => {
         const history = t.memberHistory?.find(h => h.user.toString() === emp._id.toString());
         const accepted = history?.acceptedAt || t.createdAt;
         const completedDate = history?.completedAt || t.completedAt || new Date();
 
+        const isTeam = t.assignedTo.length > 1;
+        xp += isTeam ? 15 : 10;
+
         if (new Date(completedDate) <= new Date(t.deadline)) {
           onTimeCount++;
+          xp += 5; // On-time bonus
+        } else {
+          xp -= 3; // Overdue penalty
         }
-        totalSpeedMs += Math.max(0, new Date(completedDate) - new Date(accepted));
+
+        const completionTimeMs = Math.max(0, new Date(completedDate) - new Date(accepted));
+        totalSpeedMs += completionTimeMs;
+
+        if (completionTimeMs > 0 && completionTimeMs < 24 * 60 * 60 * 1000) {
+          xp += 5; // Fast delivery bonus (< 24h)
+        }
       });
+
+      xp = Math.max(0, xp);
 
       const avgSpeedHours = completedTasks.length > 0 
         ? parseFloat((totalSpeedMs / (1000 * 60 * 60) / completedTasks.length).toFixed(1))
@@ -141,12 +156,6 @@ exports.getPMAnalytics = async (req, res) => {
       const onTimeRate = completedTasks.length > 0
         ? Math.round((onTimeCount / completedTasks.length) * 100)
         : 0;
-
-      // Simple scoring formula (out of 100)
-      // 40% total completed task ratio, 30% on time rate, 30% speed component (under 3 days gets max)
-      const completionRatio = assignedTasks.length > 0 ? (completedTasks.length / assignedTasks.length) : 0;
-      const speedScore = avgSpeedDays <= 1 ? 30 : (avgSpeedDays <= 3 ? 20 : (avgSpeedDays <= 7 ? 10 : 0));
-      const score = Math.round((completionRatio * 40) + (onTimeRate * 0.3) + speedScore);
 
       const assignedIndividualCount = assignedTasks.filter(t => t.assignedTo.length <= 1).length;
       const assignedTeamCount = assignedTasks.filter(t => t.assignedTo.length > 1).length;
@@ -167,12 +176,13 @@ exports.getPMAnalytics = async (req, res) => {
         onTimeRate,
         avgSpeedDays,
         avgSpeedHours,
-        score
+        xp,
+        score: xp // For backward compatibility
       };
     });
 
-    // Sort leaderboard by score descending, then by completion count descending
-    leaderboard.sort((a, b) => b.score - a.score || b.completedCount - a.completedCount);
+    // Sort leaderboard by XP descending, then by completion count descending
+    leaderboard.sort((a, b) => b.xp - a.xp || b.completedCount - a.completedCount);
 
     res.json({
       summary: {
@@ -219,9 +229,10 @@ exports.getEmployeeAnalytics = async (req, res) => {
     ).length;
     const pendingCount = totalAssigned - completedCount - workingCount;
 
-    // 2. On-Time & Speed
+    // 2. On-Time, Speed & XP
     let onTimeCount = 0;
     let totalSpeedMs = 0;
+    let xp = 0;
 
     const completedTasks = tasks.filter(t =>
       t.completedBy.some(id => id.toString() === userId.toString())
@@ -232,11 +243,25 @@ exports.getEmployeeAnalytics = async (req, res) => {
       const accepted = history?.acceptedAt || t.createdAt;
       const completedDate = history?.completedAt || t.completedAt || new Date();
 
+      const isTeam = t.assignedTo.length > 1;
+      xp += isTeam ? 15 : 10;
+
       if (new Date(completedDate) <= new Date(t.deadline)) {
         onTimeCount++;
+        xp += 5; // On-time bonus
+      } else {
+        xp -= 3; // Overdue penalty
       }
-      totalSpeedMs += Math.max(0, new Date(completedDate) - new Date(accepted));
+
+      const completionTimeMs = Math.max(0, new Date(completedDate) - new Date(accepted));
+      totalSpeedMs += completionTimeMs;
+
+      if (completionTimeMs > 0 && completionTimeMs < 24 * 60 * 60 * 1000) {
+        xp += 5; // Fast delivery bonus (< 24h)
+      }
     });
+
+    xp = Math.max(0, xp);
 
     const avgSpeedHours = completedTasks.length > 0
       ? parseFloat((totalSpeedMs / (1000 * 60 * 60) / completedTasks.length).toFixed(1))
@@ -296,7 +321,8 @@ exports.getEmployeeAnalytics = async (req, res) => {
         pendingCount,
         onTimeRate,
         avgSpeedDays,
-        avgSpeedHours
+        avgSpeedHours,
+        xp
       },
       trend: personalTrend,
       insight
