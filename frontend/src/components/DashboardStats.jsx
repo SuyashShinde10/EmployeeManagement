@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import api from '../api';
+import React, { useState } from 'react';
 
 const statConfig = [
   { label: 'Total Tasks',  key: 'total',      accent: 'var(--text)' },
@@ -11,22 +10,8 @@ const statConfig = [
 const teams = ['General', 'Frontend', 'Backend', 'QA', 'Marketing'];
 
 const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
-  const [employees, setEmployees] = useState([]);
-
-  useEffect(() => {
-    if (role !== 'Employee') return;
-    const fetchEmployees = async () => {
-      const companyId = localStorage.getItem('companyId');
-      if (!companyId) return;
-      try {
-        const res = await api.get(`/employees/search?companyId=${companyId}&query=&includeResigned=false`);
-        setEmployees(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchEmployees();
-  }, [role]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const userId = localStorage.getItem('userId');
 
   const displayTasks = role === 'PM' ? tasks : filteredTasks;
 
@@ -54,6 +39,18 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
   });
 
   const counts = { total, inProgress, completed, pending };
+
+  // Filter tasks that are assigned to multiple employees (for the Colleagues' Active Work view)
+  const sharedTasks = tasks.filter(task => task.assignedTo?.length > 1);
+
+  // Filter by search term
+  const filteredSharedTasks = sharedTasks.filter(task => {
+    const query = searchTerm.toLowerCase();
+    const matchTitle = task.title.toLowerCase().includes(query);
+    const matchDesc = task.description?.toLowerCase().includes(query) || false;
+    const matchMember = task.assignedTo?.some(u => u.name.toLowerCase().includes(query));
+    return matchTitle || matchDesc || matchMember;
+  });
 
   return (
     <div style={{ marginBottom: 32 }}>
@@ -113,91 +110,230 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
 
       {/* Team Work Status (Employee view only) */}
       {role === 'Employee' && (
-        <div className="ts-surface" style={{ overflow: 'hidden' }}>
-          <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
-            <span className="ts-section-title">Colleagues' Active Work</span>
-          </div>
-          <div style={{ padding: 20 }}>
-            {employees.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>
-                No active team members found.
+        <div className="ts-surface" style={{ padding: '20px', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: 16,
+            borderBottom: '1px solid var(--border)',
+            paddingBottom: 14
+          }}>
+            <div>
+              <span className="ts-section-title" style={{ fontSize: '1rem', fontWeight: 700 }}>
+                Colleagues' Active Work
+              </span>
+              <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Shared team tasks and member status tracking.
               </p>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-                {employees.map(emp => {
-                  const activeTasks = tasks.filter(t => 
-                    t.assignedTo?.some(u => u._id === emp._id) && 
-                    (t.status === 'In Progress' || t.status === 'Assigned')
-                  );
+            </div>
+            {/* Search Input */}
+            <div style={{ position: 'relative', width: '100%', maxWidth: 280 }}>
+              <input
+                type="text"
+                placeholder="Search shared tasks or members..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface-2)',
+                  color: 'var(--text)',
+                  fontSize: '0.8rem',
+                  outline: 'none',
+                  transition: 'border-color 0.15s'
+                }}
+              />
+            </div>
+          </div>
 
-                  return (
-                    <div key={emp._id} style={{
-                      padding: 14,
-                      borderRadius: 'var(--radius)',
-                      border: '1px solid var(--border)',
-                      background: 'var(--surface)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 8
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div className="ts-avatar">{emp.name.charAt(0)}</div>
+          {filteredSharedTasks.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', padding: '32px 0', margin: 0 }}>
+              {searchTerm ? 'No matching shared tasks found.' : 'No shared tasks assigned currently.'}
+            </p>
+          ) : (
+            /* Horizontal Scroll Container */
+            <div style={{
+              display: 'flex',
+              gap: 16,
+              overflowX: 'auto',
+              paddingBottom: 12,
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch'
+            }}>
+              {filteredSharedTasks.map(task => {
+                const assignedDate = new Date(task.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                });
+                const deadlineDate = new Date(task.deadline).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                });
+
+                return (
+                  <div key={task._id} style={{
+                    flex: '0 0 340px',
+                    scrollSnapAlign: 'start',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    background: 'var(--surface)',
+                    padding: 16,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: 300,
+                    boxShadow: 'var(--shadow-sm)'
+                  }}>
+                    {/* Header */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
+                        <span style={{
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          color: 'var(--text)',
+                          lineHeight: 1.3
+                        }}>
+                          {task.title}
+                        </span>
+                        <span className="ts-badge ts-badge-team" style={{
+                          background: 'var(--accent-light)',
+                          color: 'var(--accent)',
+                          fontSize: '0.65rem',
+                          padding: '2px 6px',
+                          fontWeight: 600,
+                          borderRadius: 4
+                        }}>
+                          Team Task
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p style={{
+                        fontSize: '0.8rem',
+                        color: 'var(--text-muted)',
+                        margin: '0 0 14px',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.4
+                      }} title={task.description}>
+                        {task.description || 'No description provided.'}
+                      </p>
+                    </div>
+
+                    {/* Meta info & Members status */}
+                    <div>
+                      {/* Dates */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: 8,
+                        background: 'var(--bg)',
+                        padding: '8px 10px',
+                        borderRadius: 6,
+                        marginBottom: 12,
+                        fontSize: '0.7rem',
+                        border: '1px solid var(--border)'
+                      }}>
                         <div>
-                          <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text)' }}>
-                            {emp.name}
-                          </div>
-                          <span className="ts-badge ts-badge-emp" style={{ fontSize: '0.65rem', padding: '1px 5px' }}>
-                            {emp.team}
-                          </span>
+                          <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 600, marginBottom: 2 }}>Assigned</span>
+                          <span style={{ color: 'var(--text)', fontWeight: 500 }}>{assignedDate}</span>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 600, marginBottom: 2 }}>Deadline</span>
+                          <span style={{ color: 'var(--text)', fontWeight: 500 }}>{deadlineDate}</span>
                         </div>
                       </div>
 
-                      <div style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                          ACTIVE TASKS ({activeTasks.length})
-                        </span>
-                        {activeTasks.length > 0 ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
-                            {activeTasks.map(t => {
-                              const statusColor = t.status === 'In Progress' ? '#eab308' : '#3b82f6';
-                              return (
-                                <div key={t._id} style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 6,
-                                  fontSize: '0.75rem',
-                                  color: 'var(--text)'
-                                }}>
+                      {/* Members Status List */}
+                      <div>
+                        <div style={{
+                          fontSize: '0.7rem',
+                          color: 'var(--text-muted)',
+                          fontWeight: 600,
+                          marginBottom: 6,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em'
+                        }}>
+                          Team Members & Status
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 110, overflowY: 'auto', paddingRight: 4 }}>
+                          {task.assignedTo?.map(member => {
+                            const isMe = member._id === userId;
+                            const hasCompleted = task.completedBy?.includes(member._id);
+                            
+                            let memberStatus = 'Pending';
+                            let statusColor = 'var(--text-muted)';
+                            let statusBg = 'var(--border)';
+
+                            if (hasCompleted) {
+                              memberStatus = 'Done';
+                              statusColor = 'var(--success)';
+                              statusBg = 'var(--success-light)';
+                            } else if (task.status === 'In Progress') {
+                              memberStatus = 'Working';
+                              statusColor = 'var(--warning)';
+                              statusBg = 'var(--warning-light)';
+                            }
+
+                            return (
+                              <div key={member._id} style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                fontSize: '0.75rem',
+                                padding: '6px 8px',
+                                borderRadius: 6,
+                                background: 'var(--bg)',
+                                border: '1px solid var(--border)'
+                              }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                   <span style={{
-                                    width: 6,
-                                    height: 6,
-                                    borderRadius: '50%',
-                                    background: statusColor,
-                                    flexShrink: 0
-                                  }} />
+                                    fontWeight: 600,
+                                    color: 'var(--text)'
+                                  }}>
+                                    {member.name}
+                                  </span>
                                   <span style={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                  }} title={t.title}>
-                                    {t.title}
+                                    fontSize: '0.65rem',
+                                    color: isMe ? 'var(--accent)' : 'var(--text-muted)',
+                                    background: isMe ? 'var(--accent-light)' : 'var(--border)',
+                                    padding: '1px 4px',
+                                    borderRadius: 4,
+                                    fontWeight: 500
+                                  }}>
+                                    {isMe ? 'You' : 'Team Member'}
                                   </span>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--text-subtle)', fontStyle: 'italic' }}>
-                            No active tasks.
-                          </p>
-                        )}
+                                <span style={{
+                                  fontSize: '0.65rem',
+                                  fontWeight: 600,
+                                  color: statusColor,
+                                  background: statusBg,
+                                  padding: '2px 6px',
+                                  borderRadius: 4
+                                }}>
+                                  {memberStatus}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
