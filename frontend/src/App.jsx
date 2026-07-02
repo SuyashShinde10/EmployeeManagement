@@ -11,6 +11,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const TaskDetails = lazy(() => import('./pages/TaskDetails'));
+const Analytics = lazy(() => import('./pages/Analytics'));
 
 const LoadingSpinner = () => (
   <div className="d-flex justify-content-center align-items-center vh-100">
@@ -40,6 +41,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/analytics" 
+            element={
+              <ProtectedRoute>
+                <Analytics />
               </ProtectedRoute>
             } 
           />

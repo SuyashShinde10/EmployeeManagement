@@ -148,6 +148,20 @@ const updateTaskStatus = async (req, res) => {
 
     if (status === 'In Progress') {
       await Task.findByIdAndUpdate(taskId, { $addToSet: { acceptedBy: userId } });
+      
+      const taskCheck = await Task.findById(taskId);
+      const historyIndex = taskCheck.memberHistory?.findIndex(h => h.user.toString() === userId.toString());
+      if (historyIndex === -1 || historyIndex === undefined) {
+        await Task.findByIdAndUpdate(taskId, {
+          $push: { memberHistory: { user: userId, acceptedAt: new Date() } }
+        });
+      } else {
+        await Task.updateOne(
+          { _id: taskId, 'memberHistory.user': userId },
+          { $set: { 'memberHistory.$.acceptedAt': new Date() } }
+        );
+      }
+
       updateFields.status = 'In Progress';
       if (!task.acceptedAt) updateFields.acceptedAt = new Date();
     } else if (status === 'Completed') {
@@ -160,6 +174,25 @@ const updateTaskStatus = async (req, res) => {
             acceptedBy: userId
           } 
         });
+
+        // Set completedAt in memberHistory (and acceptedAt if missing)
+        const taskCheck = await Task.findById(taskId);
+        const historyItem = taskCheck.memberHistory?.find(h => h.user.toString() === userId.toString());
+        if (!historyItem) {
+          await Task.findByIdAndUpdate(taskId, {
+            $push: { memberHistory: { user: userId, acceptedAt: new Date(), completedAt: new Date() } }
+          });
+        } else {
+          await Task.updateOne(
+            { _id: taskId, 'memberHistory.user': userId },
+            { 
+              $set: { 
+                'memberHistory.$.completedAt': new Date(),
+                'memberHistory.$.acceptedAt': historyItem.acceptedAt || new Date()
+              } 
+            }
+          );
+        }
 
         const updatedTaskCheck = await Task.findById(taskId)
           .populate('assignedTo', 'name email team')

@@ -97,6 +97,7 @@ app.use('/api/register-company', authLimiter);
 
 app.use('/api', require('./route/authRoute'));
 app.use('/api', require('./route/taskRoute'));
+app.use('/api/analytics', require('./route/analyticsRoute'));
 
 // ─── 7. Health Check ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {

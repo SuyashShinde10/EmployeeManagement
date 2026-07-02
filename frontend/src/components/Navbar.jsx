@@ -31,8 +31,23 @@ const Navbar = () => {
             <button
               className="ts-btn ts-btn-ghost ts-btn-sm"
               onClick={() => navigate('/dashboard')}
+              style={{
+                color: location.pathname === '/dashboard' ? 'var(--accent)' : 'inherit',
+                fontWeight: location.pathname === '/dashboard' ? '600' : 'normal'
+              }}
             >
               Dashboard
+            </button>
+
+            <button
+              className="ts-btn ts-btn-ghost ts-btn-sm"
+              onClick={() => navigate('/analytics')}
+              style={{
+                color: location.pathname === '/analytics' ? 'var(--accent)' : 'inherit',
+                fontWeight: location.pathname === '/analytics' ? '600' : 'normal'
+              }}
+            >
+              Analytics
             </button>
 
             <div

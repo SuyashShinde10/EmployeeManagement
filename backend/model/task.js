@@ -49,6 +49,12 @@ const taskSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
+  }],
+
+  memberHistory: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    acceptedAt: { type: Date },
+    completedAt: { type: Date }
   }]
 
 }, { timestamps: true });
