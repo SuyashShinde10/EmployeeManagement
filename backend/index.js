@@ -99,6 +99,14 @@ app.use(async (req, res, next) => {
 });
 
 // ─── 6. Routes ───────────────────────────────────────────────────────────────
+// Strip double /api prefix if present (e.g. /api/api/analytics -> /api/analytics)
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/api/')) {
+    req.url = req.url.substring(4); // Remove first '/api' segment
+  }
+  next();
+});
+
 // Apply rate limiting only to critical authentication endpoints
 app.use('/api/login', authLimiter);
 app.use('/api/register-company', authLimiter);
