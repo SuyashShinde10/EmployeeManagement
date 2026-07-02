@@ -130,6 +130,10 @@ exports.getPMAnalytics = async (req, res) => {
         totalSpeedMs += Math.max(0, new Date(completedDate) - new Date(accepted));
       });
 
+      const avgSpeedHours = completedTasks.length > 0 
+        ? parseFloat((totalSpeedMs / (1000 * 60 * 60) / completedTasks.length).toFixed(1))
+        : 0;
+
       const avgSpeedDays = completedTasks.length > 0 
         ? parseFloat((totalSpeedMs / (1000 * 60 * 60 * 24) / completedTasks.length).toFixed(1))
         : 0;
@@ -162,6 +166,7 @@ exports.getPMAnalytics = async (req, res) => {
         completedTeamCount,
         onTimeRate,
         avgSpeedDays,
+        avgSpeedHours,
         score
       };
     });
@@ -233,6 +238,10 @@ exports.getEmployeeAnalytics = async (req, res) => {
       totalSpeedMs += Math.max(0, new Date(completedDate) - new Date(accepted));
     });
 
+    const avgSpeedHours = completedTasks.length > 0
+      ? parseFloat((totalSpeedMs / (1000 * 60 * 60) / completedTasks.length).toFixed(1))
+      : 0;
+
     const avgSpeedDays = completedTasks.length > 0 
       ? parseFloat((totalSpeedMs / (1000 * 60 * 60 * 24) / completedTasks.length).toFixed(1))
       : 0;
@@ -286,7 +295,8 @@ exports.getEmployeeAnalytics = async (req, res) => {
         workingCount,
         pendingCount,
         onTimeRate,
-        avgSpeedDays
+        avgSpeedDays,
+        avgSpeedHours
       },
       trend: personalTrend,
       insight

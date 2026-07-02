@@ -3,6 +3,20 @@ import Navbar from '../components/Navbar';
 import api from '../api';
 import { toast } from 'react-toastify';
 
+const formatSpeed = (hours) => {
+  if (hours === undefined || hours === null || hours <= 0) return '--';
+  if (hours < 1) {
+    const mins = Math.round(hours * 60);
+    return `${mins} min${mins > 1 ? 's' : ''}`;
+  }
+  if (hours < 24) {
+    const roundedHours = Math.round(hours);
+    return `${roundedHours} hour${roundedHours > 1 ? 's' : ''}`;
+  }
+  const days = parseFloat((hours / 24).toFixed(1));
+  return `${days} day${days > 1 ? 's' : ''}`;
+};
+
 const Analytics = () => {
   const [range, setRange] = useState('monthly'); // 'weekly' | 'monthly' | 'annually'
   const [loading, setLoading] = useState(true);
@@ -308,7 +322,7 @@ const Analytics = () => {
                           </div>
                         </td>
                         <td style={{ padding: '14px 8px' }}>
-                          {emp.completedCount > 0 ? `${emp.avgSpeedDays} days` : '--'}
+                          {emp.completedCount > 0 ? formatSpeed(emp.avgSpeedHours) : '--'}
                         </td>
                         <td style={{ padding: '14px 8px', fontWeight: 600 }}>{emp.onTimeRate}%</td>
                         <td style={{ padding: '14px 8px', textAlign: 'right' }}>
@@ -365,7 +379,7 @@ const Analytics = () => {
                   Avg. Speed
                 </span>
                 <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '8px 0 0', color: 'var(--accent)' }}>
-                  {summary.completedCount > 0 ? `${summary.avgSpeedDays}d` : '--'}
+                  {summary.completedCount > 0 ? formatSpeed(summary.avgSpeedHours) : '--'}
                 </h2>
               </div>
               <div className="ts-surface" style={{ padding: 20 }}>
