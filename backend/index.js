@@ -60,13 +60,32 @@ const authLimiter = rateLimit({
   message: { error: 'Too many requests. Please try again in 15 minutes.' }
 });
 
-// ─── 5. Database Connection ───────────────────────────────────────────────────
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ DB Connected'))
-  .catch((err) => {
+// ─── 5. Database Connection (Serverless-Safe) ─────────────────────────────────
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+  if (!process.env.MONGO_URI) {
+    throw new Error('MONGO_URI is not defined in environment variables.');
+  }
+  const db = await mongoose.connect(process.env.MONGO_URI);
+  isConnected = db.connections[0].readyState === 1;
+  console.log('✅ DB Connected');
+};
+
+// Middleware to check DB connection before each request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
     console.error('❌ DB Connection Error:', err.message);
-    process.exit(1); // Fail fast if DB is unavailable
-  });
+    res.status(500).json({
+      error: 'Database connection failed. Please check your Vercel Environment Variables.',
+      details: err.message
+    });
+  }
+});
 
 // ─── 6. Routes ───────────────────────────────────────────────────────────────
 // Apply rate limiting only to auth endpoints
