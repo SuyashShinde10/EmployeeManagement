@@ -1,24 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const requireAuth = require('../middleware/requireAuth'); // Ensure this file exists
+const { requireAuth, requireHR } = require('../middleware/requireAuth');
 
-const { 
-  createTask, searchEmployees, assignTask, getTasks, 
+const {
+  createTask, searchEmployees, assignTask, getTasks,
   updateTaskStatus, deleteTask, editTask, addComment, getTaskById
 } = require('../controller/taskController');
 
-// APPLY SECURITY MIDDLEWARE GLOBALLY TO ALL TASK ROUTES
-// This means every route below requires a valid Token
+// All task routes require a valid JWT
 router.use(requireAuth);
 
-router.post('/task/create', createTask);
-router.get('/employees/search', searchEmployees); // GET /api/employees/search
-router.put('/task/assign', assignTask);
-router.get('/tasks/:companyId', getTasks);        // GET /api/tasks/:companyId
-router.put('/task/status', updateTaskStatus);
-router.delete('/task/:id', deleteTask);
-router.put('/task/edit/:id', editTask);
-router.get('/task/:id', getTaskById);             // GET /api/task/:id
-router.post('/task/comment/:taskId', addComment);
+// ─── Employee + HR Routes ─────────────────────────────────────────────────────
+router.get('/employees/search',       searchEmployees);
+router.get('/tasks/:companyId',       getTasks);
+router.put('/task/status',            updateTaskStatus);
+router.get('/task/:id',               getTaskById);
+router.post('/task/comment/:taskId',  addComment);
+
+// ─── HR-only Routes ───────────────────────────────────────────────────────────
+router.post('/task/create',           requireHR, createTask);
+router.put('/task/assign',            requireHR, assignTask);
+router.delete('/task/:id',            requireHR, deleteTask);
+router.put('/task/edit/:id',          requireHR, editTask);
 
 module.exports = router;

@@ -1,44 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const TaskFilters = ({ filters, setFilters }) => {
-  
-  const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
+  const statuses = ['All', 'Pending', 'Assigned', 'In Progress', 'Completed'];
 
   return (
-    <div className="row g-2 mb-3">
-      {/* Search Input */}
-      <div className="col-md-8">
-        <div className="input-group">
-          <span className="input-group-text bg-white border-end-0">
-             🔍
-          </span>
-          <input 
-            type="text" 
-            name="search"
-            className="form-control border-start-0 ps-0" 
-            placeholder="Search tasks by title..." 
-            value={filters.search}
-            onChange={handleChange}
-          />
-        </div>
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      {/* Status Pills */}
+      <div style={{ display: 'flex', gap: 4 }}>
+        {statuses.map(s => (
+          <button
+            key={s}
+            className={`ts-tab ${filters.status === s ? 'active' : ''}`}
+            onClick={() => setFilters({ ...filters, status: s })}
+            style={{ borderRadius: 0, paddingBottom: 4 }}
+          >
+            {s}
+          </button>
+        ))}
       </div>
 
-      {/* Status Filter */}
-      <div className="col-md-4">
-        <select 
-          name="status" 
-          className="form-select" 
-          value={filters.status} 
-          onChange={handleChange}
-        >
-          <option value="All">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Assigned">Assigned</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
+      {/* Search */}
+      <div className="ts-search" style={{ marginLeft: 'auto' }}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             strokeWidth="2.5" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          placeholder="Search tasks..."
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+        />
       </div>
     </div>
   );

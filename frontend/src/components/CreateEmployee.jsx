@@ -1,88 +1,135 @@
-import React, { useState } from "react";
-// 1. Use your new api instance
-import api from "../api";
-import { toast } from "react-toastify";
+import React, { useState } from 'react';
+import api from '../api';
+import { toast } from 'react-toastify';
 
-const CreateEmployee = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    team: "General"
-  });
+const DEPARTMENTS = ['General', 'Frontend', 'Backend', 'QA', 'Marketing'];
+
+const CreateEmployee = ({ onSuccess }) => {
+  const [formData, setFormData] = useState({ name: '', email: '', team: 'General' });
+  const [loading, setLoading] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const companyId = localStorage.getItem("companyId");
-    // Token is now handled automatically by api.js
+    const companyId = localStorage.getItem('companyId');
+    setLoading(true);
+    setGeneratedPassword(null);
+    setCopied(false);
 
     try {
-      // 2. Simplified API call
-      await api.post("/create-employee", {
-        ...formData,
-        hrCompanyId: companyId
-      });
-      
-      toast.success("Employee Added!");
-      setFormData({ name: "", email: "", password: "", team: "General" });
+      const res = await api.post('/create-employee', { ...formData, hrCompanyId: companyId });
+      setGeneratedPassword(res.data.generatedPassword);
+      toast.success('Employee added!');
+      setFormData({ name: '', email: '', team: 'General' });
+      if (onSuccess) onSuccess();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error creating employee");
+      toast.error(err.response?.data?.error || 'Failed to create employee.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedPassword).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
+
+  const dismiss = () => setGeneratedPassword(null);
+
   return (
-    <div className="card border-0 shadow-sm mb-4" style={{borderRadius: '12px'}}>
-      <div className="card-header bg-white border-0 pt-3 pb-0">
-         <h6 className="fw-bold text-dark mb-0">👤 Onboard Employee</h6>
+    <div className="ts-form-card">
+      <div className="ts-form-card-header">
+        <span className="ts-section-title">Onboard Employee</span>
       </div>
-      <div className="card-body">
+      <div className="ts-form-card-body">
         <form onSubmit={handleSubmit}>
-          <div className="row g-2">
-            <div className="col-md-6 mb-2">
-              <label className="small text-muted fw-bold ms-1">Name</label>
-              <input 
-                className="form-control bg-light border-0" 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              <label className="ts-label">Full Name</label>
+              <input
+                className="ts-input"
+                name="name"
+                placeholder="e.g. Priya Sharma"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
-            <div className="col-md-6 mb-2">
-              <label className="small text-muted fw-bold ms-1">Email</label>
-              <input 
-                className="form-control bg-light border-0" 
+
+            <div>
+              <label className="ts-label">Work Email</label>
+              <input
+                className="ts-input"
+                type="email"
+                name="email"
+                placeholder="e.g. priya@company.com"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
-            <div className="col-md-6 mb-2">
-               <label className="small text-muted fw-bold ms-1">Password</label>
-              <input 
-                className="form-control bg-light border-0" 
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})} 
-                required 
-              />
-            </div>
-            <div className="col-md-6 mb-2">
-               <label className="small text-muted fw-bold ms-1">Department</label>
-              <select 
-                className="form-select bg-light border-0" 
+
+            <div>
+              <label className="ts-label">Department</label>
+              <select
+                className="ts-select"
+                name="team"
                 value={formData.team}
-                onChange={(e) => setFormData({...formData, team: e.target.value})}
+                onChange={handleChange}
               >
-                <option>General</option>
-                <option>Frontend</option>
-                <option>Backend</option>
-                <option>QA</option>
-                <option>Marketing</option>
+                {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
+
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '4px 0 0' }}>
+              A secure password will be auto-generated and shown once.
+            </p>
+
+            <button className="ts-btn ts-btn-primary ts-btn-full" type="submit" disabled={loading}>
+              {loading ? 'Adding...' : 'Add to Team'}
+            </button>
           </div>
-          <button className="btn btn-dark w-100 mt-3 fw-bold" style={{borderRadius: '8px'}}>Add to Team</button>
         </form>
+
+        {/* Password Reveal */}
+        {generatedPassword && (
+          <div className="ts-password-reveal">
+            <p style={{ margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--success)' }}>
+              Employee created — share this password once and securely:
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <span className="ts-password-code">{generatedPassword}</span>
+              <button
+                className="ts-btn ts-btn-ghost ts-btn-sm"
+                type="button"
+                onClick={handleCopy}
+                style={{ marginLeft: 'auto' }}
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <p style={{ margin: '8px 0 0', fontSize: '0.7rem', color: '#15803d' }}>
+              This password will not be shown again.
+            </p>
+            <button
+              type="button"
+              onClick={dismiss}
+              style={{
+                marginTop: 10, background: 'none', border: 'none', fontSize: '0.75rem',
+                color: 'var(--text-muted)', cursor: 'pointer', padding: 0, fontFamily: 'inherit'
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

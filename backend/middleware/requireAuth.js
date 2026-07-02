@@ -1,26 +1,42 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
 
+// ─── requireAuth ─────────────────────────────────────────────────────────────
+// Verifies JWT and attaches req.user = { _id, companyId, role }
 const requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization) {
-    return res.status(401).json({ error: 'Authorization token required' });
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization token required.' });
   }
 
-  // Token format: "Bearer <token>"
   const token = authorization.split(' ')[1];
 
   try {
-    // IMPORTANT: Make sure this matches the secret in authController (createToken)
-    const { _id } = jwt.verify(token, 'SECRET_KEY'); 
+    const { _id } = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findOne({ _id }).select('_id companyId');
+    // Select only what downstream controllers need — never return password
+    req.user = await User.findById(_id).select('_id companyId role status');
+
+    if (!req.user || req.user.status === 'Resigned') {
+      return res.status(401).json({ error: 'Account is inactive or not found.' });
+    }
+
     next();
   } catch (error) {
-    console.log("Auth Error:", error.message);
-    res.status(401).json({ error: 'Request is not authorized' });
+    // Log server-side, return generic message to client
+    console.error('[requireAuth]', error.message);
+    res.status(401).json({ error: 'Invalid or expired token.' });
   }
 };
 
-module.exports = requireAuth;
+// ─── requireHR ───────────────────────────────────────────────────────────────
+// Must be used AFTER requireAuth — blocks non-HR users
+const requireHR = (req, res, next) => {
+  if (!req.user || req.user.role !== 'HR') {
+    return res.status(403).json({ error: 'Access restricted to HR accounts.' });
+  }
+  next();
+};
+
+module.exports = { requireAuth, requireHR };

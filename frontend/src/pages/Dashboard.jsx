@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// 1. Remove standard axios import
-// import axios from 'axios'; 
-// 2. Import your new custom instance
-import api from "../api";
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DashboardStats from '../components/DashboardStats';
@@ -14,69 +11,83 @@ import TaskList from '../components/TaskList';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
-  const companyId = localStorage.getItem("companyId");
-  const userId = localStorage.getItem("userId");
-  // const token = localStorage.getItem("token"); // Token is now handled automatically by api.js
+  const role      = localStorage.getItem('role');
+  const companyId = localStorage.getItem('companyId');
+  const userId    = localStorage.getItem('userId');
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [tasks, setTasks] = useState([]); 
-  const [filters, setFilters] = useState({ search: "", status: "All" });
+  const [tasks, setTasks]     = useState([]);
+  const [filters, setFilters] = useState({ search: '', status: 'All' });
 
   useEffect(() => {
+    if (!companyId) return;
     const fetchTasks = async () => {
       try {
-        // 3. SIMPLIFIED CALL:
-        // - No "http://localhost:8000/api" (api.js handles baseURL)
-        // - No "headers: { Authorization... }" (api.js handles token)
         const res = await api.get(`/tasks/${companyId}`);
         setTasks(res.data);
       } catch (err) {
-        if (err.response && err.response.status === 401) {
-            localStorage.clear();
-            navigate('/login');
+        if (err.response?.status === 401) {
+          localStorage.clear();
+          navigate('/login');
         }
       }
     };
-    
-    // 4. Ensure companyId exists before calling
-    if (companyId) fetchTasks();
+    fetchTasks();
   }, [refreshTrigger, companyId, navigate]);
 
   const refreshData = () => setRefreshTrigger(prev => prev + 1);
 
-  const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.title.toLowerCase().includes(filters.search.toLowerCase());
-    const matchesStatus = filters.status === "All" || task.status === filters.status;
-    let isVisible = true;
-    if (role === 'Employee') {
-        isVisible = task.assignedTo.some(u => u._id === userId);
-    }
-    return matchesSearch && matchesStatus && isVisible;
+  const filteredTasks = tasks.filter(task => {
+    const matchSearch = task.title.toLowerCase().includes(filters.search.toLowerCase());
+    const matchStatus = filters.status === 'All' || task.status === filters.status;
+    const isVisible   = role === 'HR' || task.assignedTo.some(u => u._id === userId);
+    return matchSearch && matchStatus && isVisible;
   });
 
+  const name = localStorage.getItem('name') || '';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
   return (
-    <div className="bg-light min-vh-100">
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <div className="container-fluid px-5 py-4">
+
+      <div style={{ padding: '28px 32px', maxWidth: 1400, margin: '0 auto' }}>
+
+        {/* Page Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+            {greeting}, {name.split(' ')[0]}
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+            {role === 'HR' ? 'Here\'s your company overview.' : 'Here are your assigned tasks.'}
+          </p>
+        </div>
+
+        {/* Stats */}
         <DashboardStats tasks={role === 'HR' ? tasks : filteredTasks} />
 
+        {/* HR Management Section */}
         {role === 'HR' && (
-          <div className="row g-4 mb-5">
-            <div className="col-lg-4 d-flex flex-column gap-4">
-              <CreateEmployee />
+          <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, marginBottom: 28 }}>
+            {/* Left sidebar: forms */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <CreateEmployee onSuccess={refreshData} />
               <CreateTask refreshTasks={refreshData} />
             </div>
-            <div className="col-lg-8">
-              {/* Note: You might need to update EmployeeList to use 'api' as well */}
-              <EmployeeList refreshTrigger={refreshTrigger} />
-            </div>
+            {/* Right: employee directory */}
+            <EmployeeList refreshTrigger={refreshTrigger} />
           </div>
         )}
 
-        <div className="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2">
-           <h4 className="fw-bold mb-0">{role === 'HR' ? 'Company Task Board' : 'My Tasks'}</h4>
-           <div className="w-50"><TaskFilters filters={filters} setFilters={setFilters} /></div>
+        {/* Task Board */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+              {role === 'HR' ? 'Task Board' : 'My Tasks'}
+            </h2>
+          </div>
+          <TaskFilters filters={filters} setFilters={setFilters} />
         </div>
 
         <TaskList tasks={filteredTasks} onTaskUpdate={refreshData} />

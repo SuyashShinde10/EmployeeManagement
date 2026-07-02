@@ -1,142 +1,240 @@
 const Task = require('../model/task');
 const User = require('../model/user');
 
-// 1. Create Task
+// ─── 1. Create Task ───────────────────────────────────────────────────────────
 const createTask = async (req, res) => {
   try {
     const { title, description, companyId, deadline } = req.body;
-    // Security: Ensure user belongs to this company
-    if (req.user.companyId.toString() !== companyId) {
-        return res.status(403).json({ error: "Unauthorized Company Access" });
+
+    if (!title || !companyId || !deadline) {
+      return res.status(400).json({ error: 'Title, companyId, and deadline are required.' });
     }
+
+    if (req.user.companyId.toString() !== companyId) {
+      return res.status(403).json({ error: 'Unauthorized company access.' });
+    }
+
     const task = new Task({ title, description, companyId, deadline });
     const result = await task.save();
     res.status(201).json(result);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    console.error('[createTask]', err);
+    res.status(500).json({ error: 'Failed to create task.' });
+  }
 };
 
-// ... (searchEmployees, assignTask remain similar, just ensure companyId matches req.user.companyId if you want extra security) ...
+// ─── 2. Search Employees ──────────────────────────────────────────────────────
 const searchEmployees = async (req, res) => {
-    try {
-      const { query, companyId, includeResigned } = req.query;
-      // Security Check
-      if (req.user.companyId.toString() !== companyId) {
-         return res.status(403).json({ error: "Unauthorized" });
-      }
-      let filter = {
-        companyId: companyId,
-        role: 'Employee',
-        $or: [
-          { name: { $regex: query || "", $options: 'i' } },
-          { team: { $regex: query || "", $options: 'i' } }
-        ]
-      };
-      if (includeResigned !== 'true') filter.status = 'Active';
-      const employees = await User.find(filter);
-      res.json(employees);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+  try {
+    const { query, companyId, includeResigned } = req.query;
+
+    if (req.user.companyId.toString() !== companyId) {
+      return res.status(403).json({ error: 'Unauthorized.' });
+    }
+
+    let filter = {
+      companyId,
+      role: 'Employee',
+      $or: [
+        { name: { $regex: query || '', $options: 'i' } },
+        { team: { $regex: query || '', $options: 'i' } }
+      ]
+    };
+
+    if (includeResigned !== 'true') filter.status = 'Active';
+
+    const employees = await User.find(filter).select('-password');
+    res.json(employees);
+  } catch (err) {
+    console.error('[searchEmployees]', err);
+    res.status(500).json({ error: 'Search failed.' });
+  }
 };
 
+// ─── 3. Assign Task ───────────────────────────────────────────────────────────
 const assignTask = async (req, res) => {
-    try {
-      const { taskId, employeeIds, companyId } = req.body;
-      const updatedTask = await Task.findOneAndUpdate(
-        { _id: taskId, companyId }, 
-        { $addToSet: { assignedTo: { $each: employeeIds } }, status: "Assigned" },
-        { new: true }
-      ).populate('assignedTo');
-      res.json(updatedTask);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+  try {
+    const { taskId, employeeIds } = req.body;
+    const companyId = req.user.companyId; // Always use server-side companyId
+
+    if (!taskId || !employeeIds || !Array.isArray(employeeIds) || employeeIds.length === 0) {
+      return res.status(400).json({ error: 'taskId and employeeIds are required.' });
+    }
+
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: taskId, companyId },
+      { $addToSet: { assignedTo: { $each: employeeIds } }, status: 'Assigned' },
+      { new: true }
+    ).populate('assignedTo', 'name email team');
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: 'Task not found or unauthorized.' });
+    }
+
+    res.json(updatedTask);
+  } catch (err) {
+    console.error('[assignTask]', err);
+    res.status(500).json({ error: 'Assignment failed.' });
+  }
 };
 
+// ─── 4. Get All Tasks for Company ─────────────────────────────────────────────
 const getTasks = async (req, res) => {
   try {
     const { companyId } = req.params;
-    // Security Check
+
     if (req.user.companyId.toString() !== companyId) {
-        return res.status(403).json({ error: "Unauthorized" });
+      return res.status(403).json({ error: 'Unauthorized.' });
     }
+
     const tasks = await Task.find({ companyId })
-      .populate('assignedTo')
-      .populate('completedBy'); 
+      .populate('assignedTo', 'name email team')
+      .populate('completedBy', 'name');
+
     res.json(tasks);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    console.error('[getTasks]', err);
+    res.status(500).json({ error: 'Failed to fetch tasks.' });
+  }
 };
 
-// THE CRITICAL SECURITY FIX IS HERE
+// ─── 5. Update Task Status ────────────────────────────────────────────────────
 const updateTaskStatus = async (req, res) => {
   try {
     const { taskId, status } = req.body;
-    
-    // SECURE: Get ID from Token
-    const userId = req.user._id; 
+    const userId = req.user._id;
+
+    if (!taskId || !status) {
+      return res.status(400).json({ error: 'taskId and status are required.' });
+    }
 
     const task = await Task.findById(taskId);
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (!task) return res.status(404).json({ message: 'Task not found.' });
 
-    // SECURE: Ensure user belongs to company
     if (task.companyId.toString() !== req.user.companyId.toString()) {
-        return res.status(403).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: 'Unauthorized.' });
     }
 
     let updateFields = {};
 
     if (status === 'In Progress') {
-        updateFields.status = 'In Progress';
-        if (!task.acceptedAt) updateFields.acceptedAt = new Date();
-    } 
-    else if (status === 'Completed') {
-        const alreadyCompleted = task.completedBy.includes(userId);
-        if (!alreadyCompleted) {
-            await Task.findByIdAndUpdate(taskId, { $addToSet: { completedBy: userId } });
-            
-            // Check totals
-            const updatedTaskCheck = await Task.findById(taskId);
-            const totalAssigned = updatedTaskCheck.assignedTo.length;
-            const totalCompleted = updatedTaskCheck.completedBy.length;
+      updateFields.status = 'In Progress';
+      if (!task.acceptedAt) updateFields.acceptedAt = new Date();
+    } else if (status === 'Completed') {
+      const alreadyCompleted = task.completedBy.some(id => id.toString() === userId.toString());
+      if (!alreadyCompleted) {
+        await Task.findByIdAndUpdate(taskId, { $addToSet: { completedBy: userId } });
 
-            if (totalCompleted >= totalAssigned) {
-                updateFields.status = 'Completed';
-                updateFields.completedAt = new Date();
-            } else {
-                return res.json(updatedTaskCheck);
-            }
+        const updatedTaskCheck = await Task.findById(taskId);
+        const totalAssigned = updatedTaskCheck.assignedTo.length;
+        const totalCompleted = updatedTaskCheck.completedBy.length;
+
+        if (totalCompleted >= totalAssigned) {
+          updateFields.status = 'Completed';
+          updateFields.completedAt = new Date();
+        } else {
+          return res.json(updatedTaskCheck);
         }
+      }
     }
 
     const finalTask = await Task.findByIdAndUpdate(taskId, updateFields, { new: true })
-        .populate('assignedTo').populate('completedBy');
+      .populate('assignedTo', 'name email team')
+      .populate('completedBy', 'name');
 
     res.json(finalTask);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    console.error('[updateTaskStatus]', err);
+    res.status(500).json({ error: 'Status update failed.' });
+  }
 };
 
-// ... (deleteTask, editTask, addComment, getTaskById - Standard) ...
+// ─── 6. Delete Task (HR only, enforced via route) ─────────────────────────────
 const deleteTask = async (req, res) => {
-    try { await Task.findByIdAndDelete(req.params.id); res.json({ message: "Deleted" }); } 
-    catch (err) { res.status(500).json({ error: err.message }); }
-};
-const editTask = async (req, res) => {
-    try { 
-        const { title, description, deadline } = req.body;
-        const updatedTask = await Task.findByIdAndUpdate(req.params.id, { title, description, deadline }, { new: true });
-        res.json(updatedTask); 
-    } catch (err) { res.status(500).json({ error: err.message }); }
-};
-const addComment = async (req, res) => {
-    try {
-      const { taskId } = req.params;
-      const { text } = req.body;
-      const userId = req.user._id; // Secure ID from token
-      const task = await Task.findByIdAndUpdate(taskId, { $push: { comments: { user: userId, text } } }, { new: true }).populate('comments.user', 'name'); 
-      res.json(task);
-    } catch (err) { res.status(500).json({ error: err.message }); }
-};
-const getTaskById = async (req, res) => {
-    try {
-      const task = await Task.findById(req.params.id).populate('assignedTo', 'name email').populate('completedBy', 'name').populate('comments.user', 'name');
-      res.json(task);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+  try {
+    const task = await Task.findOne({ _id: req.params.id, companyId: req.user.companyId });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found or unauthorized.' });
+    }
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Task deleted.' });
+  } catch (err) {
+    console.error('[deleteTask]', err);
+    res.status(500).json({ error: 'Delete failed.' });
+  }
 };
 
-module.exports = { createTask, searchEmployees, assignTask, getTasks, updateTaskStatus, deleteTask, editTask, addComment, getTaskById };
+// ─── 7. Edit Task (HR only, enforced via route) ───────────────────────────────
+const editTask = async (req, res) => {
+  try {
+    const { title, description, deadline } = req.body;
+
+    const task = await Task.findOne({ _id: req.params.id, companyId: req.user.companyId });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found or unauthorized.' });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      { title, description, deadline },
+      { new: true }
+    );
+    res.json(updatedTask);
+  } catch (err) {
+    console.error('[editTask]', err);
+    res.status(500).json({ error: 'Edit failed.' });
+  }
+};
+
+// ─── 8. Add Comment ───────────────────────────────────────────────────────────
+const addComment = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { text } = req.body;
+    const userId = req.user._id;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Comment text is required.' });
+    }
+
+    const task = await Task.findOne({ _id: taskId, companyId: req.user.companyId });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found.' });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { $push: { comments: { user: userId, text: text.trim() } } },
+      { new: true }
+    ).populate('comments.user', 'name');
+
+    res.json(updatedTask);
+  } catch (err) {
+    console.error('[addComment]', err);
+    res.status(500).json({ error: 'Failed to post comment.' });
+  }
+};
+
+// ─── 9. Get Task By ID ────────────────────────────────────────────────────────
+const getTaskById = async (req, res) => {
+  try {
+    const task = await Task.findOne({ _id: req.params.id, companyId: req.user.companyId })
+      .populate('assignedTo', 'name email team')
+      .populate('completedBy', 'name')
+      .populate('comments.user', 'name');
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found.' });
+    }
+
+    res.json(task);
+  } catch (err) {
+    console.error('[getTaskById]', err);
+    res.status(500).json({ error: 'Failed to fetch task.' });
+  }
+};
+
+module.exports = {
+  createTask, searchEmployees, assignTask, getTasks,
+  updateTaskStatus, deleteTask, editTask, addComment, getTaskById
+};

@@ -1,130 +1,140 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import api from '../api';
+import { toast } from 'react-toastify';
 
 const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [employees, setEmployees] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 1. ALWAYS Run Hooks (Move safety checks AFTER hooks)
   useEffect(() => {
     const searchEmployees = async () => {
-      const companyId = localStorage.getItem("companyId");
-      const token = localStorage.getItem("token"); // GET TOKEN
-      
+      const companyId = localStorage.getItem('companyId');
+      if (!companyId) return;
       try {
-          // Only run if we have the token/companyId
-          if (companyId && token) {
-             const res = await axios.get(`http://localhost:8000/api/employees/search?companyId=${companyId}&query=${query}`, {
-                headers: { Authorization: `Bearer ${token}` }
-             });
-             setEmployees(res.data);
-          }
+        const res = await api.get(`/employees/search?companyId=${companyId}&query=${query}`);
+        setEmployees(res.data);
       } catch (err) {
-          console.error(err);
+        console.error(err);
       }
     };
-    
+
     const timeout = setTimeout(searchEmployees, 300);
     return () => clearTimeout(timeout);
   }, [query]);
 
-  // 2. Safety Check (MUST be placed AFTER all hooks)
   if (!task) return null;
 
-  const toggleSelect = (id) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter(empId => empId !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
-    }
+  const toggle = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
   };
 
   const handleAssign = async () => {
-    const companyId = localStorage.getItem("companyId");
-    const token = localStorage.getItem("token");
-
+    if (selectedIds.length === 0) return;
+    setLoading(true);
     try {
-      await axios.put("http://localhost:8000/api/task/assign", {
+      await api.put('/task/assign', {
         taskId: task._id,
-        employeeIds: selectedIds,
-        companyId
-      }, {
-         headers: { Authorization: `Bearer ${token}` }
+        employeeIds: selectedIds
       });
-      toast.success("Assigned successfully!");
+      toast.success('Task assigned!');
       onAssignSuccess();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || "Assignment Failed");
+      toast.error(err.response?.data?.error || 'Assignment failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="modal d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: 'blur(4px)', zIndex: 1050 }}>
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content border-0 shadow-lg" style={{borderRadius: '16px'}}>
-          
-          <div className="modal-header border-0 pb-0">
-            <div>
-                <h5 className="modal-title fw-bold">Assign Task</h5>
-                <p className="text-muted small mb-0">
-                    Select team members for <span className="text-dark fw-bold">"{task.title}"</span>
-                </p>
-            </div>
-            <button onClick={onClose} className="btn-close"></button>
+    <div className="ts-modal-overlay" onClick={onClose}>
+      <div className="ts-modal" onClick={e => e.stopPropagation()}>
+        <div className="ts-modal-header">
+          <div>
+            <p style={{ margin: 0, fontWeight: 700, color: 'var(--text)' }}>Assign Task</p>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {task.title}
+            </p>
           </div>
-          
-          <div className="modal-body">
-            {error && <div className="alert alert-danger py-2 small">{error}</div>}
+          <button className="ts-close-btn" onClick={onClose}>✕</button>
+        </div>
 
-            <div className="bg-light p-2 rounded-3 mb-3">
-                <input 
-                  type="text" 
-                  className="form-control border-0 bg-transparent" 
-                  placeholder="🔍 Search by name or team..." 
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  autoFocus
-                />
-            </div>
+        <div className="ts-modal-body">
+          {/* Search */}
+          <div className="ts-search" style={{ marginBottom: 12 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              placeholder="Search by name or team..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoFocus
+            />
+          </div>
 
-            <div className="list-group list-group-flush border rounded-3" style={{ maxHeight: "250px", overflowY: "auto" }}>
-              {employees.map(emp => (
-                <label key={emp._id} className="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 py-3" style={{cursor: 'pointer'}}>
-                  <input 
-                    type="checkbox" 
-                    className="form-check-input mt-0" 
-                    style={{width: '1.2em', height: '1.2em'}}
-                    onChange={() => toggleSelect(emp._id)}
-                    checked={selectedIds.includes(emp._id)}
+          {/* Employee List */}
+          <div style={{
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            maxHeight: 240,
+            overflowY: 'auto'
+          }}>
+            {employees.length === 0 ? (
+              <p style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>
+                No active employees found.
+              </p>
+            ) : employees.map(emp => {
+              const isSelected = selectedIds.includes(emp._id);
+              return (
+                <label
+                  key={emp._id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '10px 14px',
+                    borderBottom: '1px solid var(--border)',
+                    cursor: 'pointer',
+                    background: isSelected ? 'var(--accent-light)' : 'transparent',
+                    transition: 'background 0.1s'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggle(emp._id)}
+                    style={{ accentColor: 'var(--accent)', width: 16, height: 16 }}
                   />
-                  <div className="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style={{width: 35, height: 35}}>
-                     {emp.name.charAt(0)}
-                  </div>
-                  <div className="flex-grow-1">
-                    <div className="fw-bold text-dark" style={{fontSize: '0.95rem'}}>{emp.name}</div>
-                    <div className="text-muted small">{emp.team}</div>
+                  <div className="ts-avatar">{emp.name.charAt(0)}</div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text)' }}>{emp.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{emp.team}</div>
                   </div>
                 </label>
-              ))}
-              {employees.length === 0 && <p className="text-center text-muted my-3 small">No active employees found.</p>}
-            </div>
-
-            <div className="text-end mt-2">
-                 <small className="text-muted">{selectedIds.length} selected</small>
-            </div>
-
+              );
+            })}
           </div>
-          
-          <div className="modal-footer border-0 pt-0">
-            <button onClick={onClose} className="btn btn-light text-muted fw-bold">Cancel</button>
-            <button onClick={handleAssign} className="btn btn-primary fw-bold px-4" disabled={selectedIds.length === 0}>
-              Confirm Assignment
-            </button>
-          </div>
+
+          <p style={{ margin: '8px 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            {selectedIds.length} selected
+          </p>
+        </div>
+
+        <div className="ts-modal-footer">
+          <button className="ts-btn ts-btn-ghost" onClick={onClose}>Cancel</button>
+          <button
+            className="ts-btn ts-btn-primary"
+            onClick={handleAssign}
+            disabled={selectedIds.length === 0 || loading}
+          >
+            {loading ? 'Assigning...' : 'Confirm Assignment'}
+          </button>
         </div>
       </div>
     </div>

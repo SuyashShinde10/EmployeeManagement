@@ -1,80 +1,138 @@
-import React, { useState } from "react";
-// 1. IMPORT THE HELPER (This handles the URL automatically)
-import api from "../api"; 
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react';
+import api from '../api';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    companyName: "",
-    hrName: "",
-    email: "",
-    password: ""
+    companyName: '',
+    hrName: '',
+    email: '',
+    password: ''
   });
+  const [error, setError]     = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password.length < 8) {
+      return setError('Password must be at least 8 characters.');
+    }
+    setLoading(true);
     try {
-      // 2. USE 'api.post' AND REMOVE THE URL
-      // The api.js file automatically inserts the Vercel Backend URL
-      await api.post("/register-company", formData);
-      
-      alert("Registration Successful! Please Login.");
-      navigate("/login");
+      await api.post('/register-company', formData);
+      navigate('/login', { state: { registered: true } });
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.error || "Registration Failed");
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100" 
-         style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-      <div className="card border-0 shadow-lg" style={{ width: "450px", borderRadius: "16px", background: "rgba(255, 255, 255, 0.95)" }}>
-        <div className="card-body p-5 position-relative">
-          
-          <div className="position-absolute top-0 start-0 p-4">
-             <Link to="/" className="text-decoration-none text-muted small fw-bold">← Home</Link>
-          </div>
+    <div style={{
+      minHeight: '100vh', background: 'var(--bg)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', padding: 16
+    }}>
+      <Link to="/" style={{ textDecoration: 'none', marginBottom: 28 }}>
+        <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text)', letterSpacing: '-0.5px' }}>
+          TeamSync
+        </span>
+      </Link>
 
-          <div className="text-center mb-4 mt-3">
-            <h3 className="fw-bold text-dark mb-1">Get Started</h3>
-            <p className="text-muted small">Set up your company workspace</p>
-          </div>
+      <div className="ts-surface" style={{ width: '100%', maxWidth: 420 }}>
+        <div style={{ padding: '24px 28px' }}>
+          <h1 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+            Create your workspace
+          </h1>
+          <p style={{ margin: '0 0 24px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+            Set up your company and HR account in seconds.
+          </p>
 
-          <form onSubmit={handleSubmit}>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label text-secondary small fw-bold">Company Name</label>
-                <input name="companyName" className="form-control bg-light border-0" onChange={handleChange} required />
+          {error && (
+            <div style={{
+              marginBottom: 16, padding: '10px 14px',
+              background: 'var(--danger-light)', border: '1px solid #fca5a5',
+              borderRadius: 'var(--radius)', fontSize: '0.8rem', color: 'var(--danger)'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label className="ts-label">Company Name</label>
+                <input
+                  className="ts-input"
+                  name="companyName"
+                  placeholder="Acme Corp"
+                  onChange={handleChange}
+                  required
+                  autoFocus
+                />
               </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label text-secondary small fw-bold">Your Name</label>
-                <input name="hrName" className="form-control bg-light border-0" onChange={handleChange} required />
+              <div>
+                <label className="ts-label">Your Name</label>
+                <input
+                  className="ts-input"
+                  name="hrName"
+                  placeholder="Jane Doe"
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
-            
-            <div className="mb-3">
-              <label className="form-label text-secondary small fw-bold">Work Email</label>
-              <input name="email" type="email" className="form-control bg-light border-0" onChange={handleChange} required />
+
+            <div>
+              <label className="ts-label">Work Email</label>
+              <input
+                className="ts-input"
+                type="email"
+                name="email"
+                placeholder="jane@acme.com"
+                onChange={handleChange}
+                required
+              />
             </div>
-            <div className="mb-4">
-              <label className="form-label text-secondary small fw-bold">Password</label>
-              <input name="password" type="password" className="form-control bg-light border-0" onChange={handleChange} required />
+
+            <div>
+              <label className="ts-label">Password</label>
+              <input
+                className="ts-input"
+                type="password"
+                name="password"
+                placeholder="Min. 8 characters"
+                onChange={handleChange}
+                required
+                minLength={8}
+              />
             </div>
-            
-            <button className="btn btn-dark w-100 py-2 fw-bold shadow-sm" style={{ borderRadius: "8px" }}>Create Account</button>
+
+            <button
+              className="ts-btn ts-btn-primary ts-btn-full"
+              type="submit"
+              disabled={loading}
+              style={{ marginTop: 4 }}
+            >
+              {loading ? 'Creating account...' : 'Create Account'}
+            </button>
           </form>
+        </div>
 
-          <div className="mt-4 text-center">
-            <p className="text-muted small">
-              Already have an account? <Link to="/login" className="text-decoration-none fw-bold text-dark">Sign In</Link>
-            </p>
-          </div>
+        <div style={{ padding: '14px 28px', borderTop: '1px solid var(--border)', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Already have an account?{' '}
+            <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}>
+              Sign in
+            </Link>
+          </span>
         </div>
       </div>
     </div>

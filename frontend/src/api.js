@@ -1,38 +1,33 @@
-import axios from "axios";
+import axios from 'axios';
 
-// 1. Create the Axios instance
 const api = axios.create({
-  // VITE_API_URL will be set in Vercel Dashboard later.
-  // For now, it defaults to localhost so your code still works on your computer.
- baseURL: import.meta.env.VITE_API_URL || "https://employeemanagement-eta-seven.vercel.app/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: import.meta.env.VITE_API_URL || 'https://employeemanagement-eta-seven.vercel.app/api',
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 15000
 });
 
-// 2. Request Interceptor: Automatically add Token to every request
+// Request interceptor: attach token automatically
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// 3. Response Interceptor: Handle Global Errors (Optional but recommended)
-// This catches 401 (Unauthorized) errors if the token expires
+// Response interceptor: auto-logout on 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Optional: Logout user if token is invalid
-      // localStorage.removeItem("token");
-      // window.location.href = "/login";
+    if (error.response?.status === 401) {
+      // Token expired or invalid — clear session and redirect
+      localStorage.clear();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
