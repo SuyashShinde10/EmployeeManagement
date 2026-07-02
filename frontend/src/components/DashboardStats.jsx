@@ -202,16 +202,29 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
                         }}>
                           {task.title}
                         </span>
-                        <span className="ts-badge ts-badge-team" style={{
-                          background: 'var(--accent-light)',
-                          color: 'var(--accent)',
-                          fontSize: '0.65rem',
-                          padding: '2px 6px',
-                          fontWeight: 600,
-                          borderRadius: 4
-                        }}>
-                          Team Task
-                        </span>
+                        {task.assignedTo?.length > 1 ? (
+                          <span className="ts-badge ts-badge-team" style={{
+                            background: 'var(--accent-light)',
+                            color: 'var(--accent)',
+                            fontSize: '0.65rem',
+                            padding: '2px 6px',
+                            fontWeight: 600,
+                            borderRadius: 4
+                          }}>
+                            Team Task
+                          </span>
+                        ) : (
+                          <span className="ts-badge ts-badge-success" style={{
+                            background: 'var(--success-light)',
+                            color: 'var(--success)',
+                            fontSize: '0.65rem',
+                            padding: '2px 6px',
+                            fontWeight: 600,
+                            borderRadius: 4
+                          }}>
+                            Individual Task
+                          </span>
+                        )}
                       </div>
 
                       {/* Description */}

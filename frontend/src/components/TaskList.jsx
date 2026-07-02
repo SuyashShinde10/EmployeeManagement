@@ -82,9 +82,15 @@ const TaskList = ({ tasks, onTaskUpdate }) => {
                   </h6>
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '3px 8px', fontSize: '0.75rem' }}>
-                    Team Task
-                  </span>
+                  {task.assignedTo.length > 1 ? (
+                    <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '3px 8px', fontSize: '0.75rem' }}>
+                      Team Task
+                    </span>
+                  ) : (
+                    <span className="ts-badge ts-badge-success" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '3px 8px', fontSize: '0.75rem' }}>
+                      Individual Task
+                    </span>
+                  )}
                   {role === 'PM' && (
                     <button
                       className="ts-btn ts-btn-danger ts-btn-sm"
