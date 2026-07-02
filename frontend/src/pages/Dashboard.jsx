@@ -52,7 +52,20 @@ const Dashboard = () => {
     });
 
     socket.on('task_updated', (updatedTask) => {
-      setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t));
+      setTasks(prev => {
+        const exists = prev.some(t => t._id === updatedTask._id);
+        const isVisible = role === 'PM' || updatedTask.assignedTo?.some(u => u._id === userId);
+
+        if (isVisible) {
+          if (exists) {
+            return prev.map(t => t._id === updatedTask._id ? updatedTask : t);
+          } else {
+            return [...prev, updatedTask];
+          }
+        } else {
+          return prev.filter(t => t._id !== updatedTask._id);
+        }
+      });
     });
 
     socket.on('task_deleted', (deletedTaskId) => {
@@ -65,6 +78,27 @@ const Dashboard = () => {
       socket.off('task_deleted');
       socket.disconnect();
     };
+  }, [companyId, role, userId]);
+
+  // Serverless-safe fallback: poll tasks every 5 seconds to support Vercel deployments
+  useEffect(() => {
+    if (!companyId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get(`/tasks/${companyId}`);
+        setTasks(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(res.data)) {
+            return res.data;
+          }
+          return prev;
+        });
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [companyId]);
 
   const refreshData = () => setRefreshTrigger(prev => prev + 1);

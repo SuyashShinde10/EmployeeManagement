@@ -56,6 +56,27 @@ const TaskDetails = () => {
     };
   }, [companyId, id]);
 
+  // Serverless-safe fallback: poll task details every 5 seconds to support Vercel deployments
+  useEffect(() => {
+    if (!id) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get(`/task/${id}`);
+        setTask(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(res.data)) {
+            return res.data;
+          }
+          return prev;
+        });
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [id]);
+
   const handleComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
