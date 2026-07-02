@@ -11,17 +11,37 @@ const app = express();
 app.use(helmet());
 
 // ─── 2. CORS — Restrict to Known Frontend Origin ──────────────────────────────
-const allowedOrigins = process.env.FRONTEND_URL
-  ? [process.env.FRONTEND_URL]
-  : ['http://localhost:5173', 'http://localhost:3000'];
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Allow non-browser requests (Postman, mobile apps)
+  
+  // Allow localhost/127.0.0.1
+  if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) {
+    return true;
+  }
+  
+  // Allow env-configured URL
+  if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+    return true;
+  }
+  
+  // Allow any deployment matching employee-management or teamsync on vercel.app
+  const lowerOrigin = origin.toLowerCase();
+  if (
+    (lowerOrigin.includes('employee-management') || lowerOrigin.includes('employeemanagement') || lowerOrigin.includes('teamsync')) &&
+    lowerOrigin.endsWith('.vercel.app')
+  ) {
+    return true;
+  }
+  
+  return false;
+};
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (Postman, server-to-server) or whitelisted origins
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false); // Reject silently so browser blocks it, without 500 error
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

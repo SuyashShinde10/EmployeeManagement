@@ -40,6 +40,20 @@ const Register = () => {
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', padding: 16
     }}>
+      {/* Back to Home Link */}
+      <Link to="/" style={{
+        textDecoration: 'none',
+        fontSize: '0.85rem',
+        color: 'var(--text-subtle)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        marginBottom: 12,
+        fontWeight: 500
+      }}>
+        <span>←</span> Back to Home
+      </Link>
+
       <Link to="/" style={{ textDecoration: 'none', marginBottom: 28 }}>
         <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text)', letterSpacing: '-0.5px' }}>
           TeamSync
