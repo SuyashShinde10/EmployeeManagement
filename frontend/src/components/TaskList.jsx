@@ -107,28 +107,53 @@ const TaskList = ({ tasks, onTaskUpdate }) => {
                 {/* Assignees + Deadline */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   {/* Avatar stack */}
-                  <div style={{ display: 'flex' }}>
+                   <div style={{ display: 'flex' }}>
                     {task.assignedTo.length > 0 ? (
-                      task.assignedTo.slice(0, 4).map((u, i) => (
-                        <div
-                          key={u._id}
-                          title={u.name}
-                          style={{
-                            width: 26, height: 26,
-                            borderRadius: '50%',
-                            background: 'var(--accent-light)',
-                            color: 'var(--accent)',
-                            fontSize: '0.65rem', fontWeight: 700,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            border: '2px solid var(--surface)',
-                            marginLeft: i > 0 ? -8 : 0,
-                            zIndex: 4 - i,
-                            position: 'relative'
-                          }}
-                        >
-                          {u.name.charAt(0)}
-                        </div>
-                      ))
+                      task.assignedTo.slice(0, 4).map((u, i) => {
+                        const isDone = task.completedBy?.some(c => (c._id || c).toString() === u._id.toString());
+                        const isWorking = task.acceptedBy?.some(a => (a._id || a).toString() === u._id.toString());
+                        
+                        let dotColor = '#9ca3af'; // Pending
+                        let statusText = 'Pending';
+                        if (isDone) {
+                          dotColor = '#10b981'; // Done
+                          statusText = 'Done';
+                        } else if (isWorking) {
+                          dotColor = '#f59e0b'; // Working
+                          statusText = 'Working';
+                        }
+
+                        return (
+                          <div
+                            key={u._id}
+                            title={`${u.name} (${statusText})`}
+                            style={{
+                              width: 26, height: 26,
+                              borderRadius: '50%',
+                              background: 'var(--accent-light)',
+                              color: 'var(--accent)',
+                              fontSize: '0.65rem', fontWeight: 700,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              border: '2px solid var(--surface)',
+                              marginLeft: i > 0 ? -8 : 0,
+                              zIndex: 4 - i,
+                              position: 'relative'
+                            }}
+                          >
+                            {u.name.charAt(0)}
+                            <div style={{
+                              position: 'absolute',
+                              top: -2,
+                              right: -2,
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              background: dotColor,
+                              border: '1.5px solid var(--surface)'
+                            }} />
+                          </div>
+                        );
+                      })
                     ) : (
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontStyle: 'italic' }}>Unassigned</span>
                     )}
