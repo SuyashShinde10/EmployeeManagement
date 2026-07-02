@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import axios from 'axios';
+import api from '../api';
 import { toast } from 'react-toastify';
 
 const Analytics = () => {
@@ -12,14 +12,11 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const endpoint = role === 'PM' 
-        ? `${import.meta.env.VITE_API_URL}/api/analytics/pm?range=${range}`
-        : `${import.meta.env.VITE_API_URL}/api/analytics/employee?range=${range}`;
+        ? `/analytics/pm?range=${range}`
+        : `/analytics/employee?range=${range}`;
 
-      const res = await axios.get(endpoint, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(endpoint);
       setData(res.data);
     } catch (err) {
       console.error(err);

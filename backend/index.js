@@ -13,25 +13,31 @@ app.set('trust proxy', 1);
 // ─── 1. Security Headers (Helmet) ────────────────────────────────────────────
 app.use(helmet());
 
-// ─── 2. CORS — Restrict to Known Frontend Origin ──────────────────────────────
 const isOriginAllowed = (origin) => {
   if (!origin) return true; // Allow non-browser requests (Postman, mobile apps)
   
+  // Normalize origin: lowercase, trim, remove trailing slash
+  const lowerOrigin = origin.toLowerCase().trim().replace(/\/+$/, '');
+  
   // Allow localhost/127.0.0.1
-  if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) {
+  if (/^https?:\/\/localhost(:\d+)?$/.test(lowerOrigin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(lowerOrigin)) {
     return true;
   }
   
-  // Allow env-configured URL
-  if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-    return true;
+  // Allow env-configured URL (normalized)
+  if (process.env.FRONTEND_URL) {
+    const cleanFrontendUrl = process.env.FRONTEND_URL.toLowerCase().trim().replace(/\/+$/, '');
+    if (lowerOrigin === cleanFrontendUrl) {
+      return true;
+    }
   }
   
-  // Allow any deployment matching employee-management or teamsync on vercel.app
-  const lowerOrigin = origin.toLowerCase();
+  // Allow any deployment containing employee-management, employeemanagement, or teamsync on vercel.app
   if (
-    (lowerOrigin.includes('employee-management') || lowerOrigin.includes('employeemanagement') || lowerOrigin.includes('teamsync')) &&
-    lowerOrigin.endsWith('.vercel.app')
+    (lowerOrigin.includes('employee-management') || 
+     lowerOrigin.includes('employeemanagement') || 
+     lowerOrigin.includes('teamsync')) &&
+    (lowerOrigin.includes('.vercel.app') || lowerOrigin.endsWith('vercel.app'))
   ) {
     return true;
   }
@@ -41,7 +47,9 @@ const isOriginAllowed = (origin) => {
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (isOriginAllowed(origin)) {
+    const allowed = isOriginAllowed(origin);
+    console.log(`[CORS Check] Origin: ${origin} | Allowed: ${allowed}`);
+    if (allowed) {
       callback(null, true);
     } else {
       callback(null, false); // Reject silently so browser blocks it, without 500 error
