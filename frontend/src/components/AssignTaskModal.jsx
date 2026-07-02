@@ -90,6 +90,7 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
                 No active employees found.
               </p>
             ) : employees.map(emp => {
+              const isAlreadyAssigned = task.assignedTo?.some(u => u._id === emp._id);
               const isSelected = selectedIds.includes(emp._id);
               return (
                 <label
@@ -100,15 +101,19 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
                     gap: 12,
                     padding: '10px 14px',
                     borderBottom: '1px solid var(--border)',
-                    cursor: 'pointer',
-                    background: isSelected ? 'var(--accent-light)' : 'transparent',
+                    cursor: isAlreadyAssigned ? 'default' : 'pointer',
+                    background: isSelected ? 'var(--accent-light)' : isAlreadyAssigned ? 'var(--surface-2)' : 'transparent',
+                    opacity: isAlreadyAssigned ? 0.7 : 1,
                     transition: 'background 0.1s'
                   }}
                 >
                   <input
                     type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggle(emp._id)}
+                    checked={isSelected || isAlreadyAssigned}
+                    disabled={isAlreadyAssigned}
+                    onChange={() => {
+                      if (!isAlreadyAssigned) toggle(emp._id);
+                    }}
                     style={{ accentColor: 'var(--accent)', width: 16, height: 16 }}
                   />
                   <div className="ts-avatar">{emp.name.charAt(0)}</div>
@@ -116,6 +121,11 @@ const AssignTaskModal = ({ task, onClose, onAssignSuccess }) => {
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text)' }}>{emp.name}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{emp.team}</div>
                   </div>
+                  {isAlreadyAssigned && (
+                    <span className="ts-badge ts-badge-assigned" style={{ fontSize: '0.65rem', marginLeft: 'auto', background: 'var(--border)', color: 'var(--text-muted)' }}>
+                      Already Assigned
+                    </span>
+                  )}
                 </label>
               );
             })}

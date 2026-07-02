@@ -268,7 +268,8 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 110, overflowY: 'auto', paddingRight: 4 }}>
                           {task.assignedTo?.map(member => {
                             const isMe = member._id === userId;
-                            const hasCompleted = task.completedBy?.includes(member._id);
+                            const hasCompleted = task.completedBy?.some(c => (c._id || c).toString() === member._id.toString());
+                            const hasAccepted = task.acceptedBy?.some(a => (a._id || a).toString() === member._id.toString());
                             
                             let memberStatus = 'Pending';
                             let statusColor = 'var(--text-muted)';
@@ -278,7 +279,7 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
                               memberStatus = 'Done';
                               statusColor = 'var(--success)';
                               statusBg = 'var(--success-light)';
-                            } else if (task.status === 'In Progress') {
+                            } else if (hasAccepted) {
                               memberStatus = 'Working';
                               statusColor = 'var(--warning)';
                               statusBg = 'var(--warning-light)';

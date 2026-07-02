@@ -27,6 +27,11 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  // NEW: Tracks which specific employees have accepted/started working on it
+  acceptedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   
   companyId: {
     type: mongoose.Schema.Types.ObjectId,

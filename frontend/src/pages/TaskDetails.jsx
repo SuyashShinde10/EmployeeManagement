@@ -181,19 +181,46 @@ const TaskDetails = () => {
                 {task.description || 'No description provided.'}
               </p>
 
-              {/* Assignees */}
+              {/* Assignees Status */}
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                <span className="ts-label">Assignees</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
+                <span className="ts-label" style={{ marginBottom: 8, display: 'block' }}>Assignees Status</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10, marginTop: 8 }}>
                   {task.assignedTo.map(u => {
-                    const done = task.completedBy.some(c => c._id === u._id);
+                    const isDone = task.completedBy?.some(c => (c._id || c).toString() === u._id.toString());
+                    const isWorking = task.acceptedBy?.some(a => (a._id || a).toString() === u._id.toString());
+                    
+                    let statusLabel = 'Pending';
+                    let statusClass = 'ts-badge-pending';
+                    if (isDone) {
+                      statusLabel = 'Done';
+                      statusClass = 'ts-badge-completed';
+                    } else if (isWorking) {
+                      statusLabel = 'Working';
+                      statusClass = 'ts-badge-progress';
+                    }
+                    
                     return (
-                      <span
-                        key={u._id}
-                        className={`ts-badge ${done ? 'ts-badge-completed' : 'ts-badge-assigned'}`}
-                      >
-                        {u.name} {done && '✓'}
-                      </span>
+                      <div key={u._id} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '10px 14px',
+                        borderRadius: 8,
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div className="ts-avatar" style={{ width: 24, height: 24, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {u.name.charAt(0)}
+                          </div>
+                          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text)' }}>
+                            {u.name}
+                          </span>
+                        </div>
+                        <span className={`ts-badge ${statusClass}`} style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
+                          {statusLabel}
+                        </span>
+                      </div>
                     );
                   })}
                   {task.assignedTo.length === 0 && (

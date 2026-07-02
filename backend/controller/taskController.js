@@ -19,7 +19,8 @@ const createTask = async (req, res) => {
 
     const populatedTask = await Task.findById(result._id)
       .populate('assignedTo', 'name email team')
-      .populate('completedBy', 'name');
+      .populate('completedBy', 'name')
+      .populate('acceptedBy', 'name');
 
     const io = req.app.get('socketio');
     if (io) {
@@ -71,11 +72,23 @@ const assignTask = async (req, res) => {
       return res.status(400).json({ error: 'taskId and employeeIds are required.' });
     }
 
-    const updatedTask = await Task.findOneAndUpdate(
-      { _id: taskId, companyId },
-      { $addToSet: { assignedTo: { $each: employeeIds } }, status: 'Assigned' },
+    const task = await Task.findOne({ _id: taskId, companyId });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found or unauthorized.' });
+    }
+
+    const newEmployeeIds = employeeIds.filter(id => !task.assignedTo.some(currId => currId.toString() === id.toString()));
+    if (newEmployeeIds.length === 0) {
+      return res.status(400).json({ error: 'Selected employees are already assigned to this task.' });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { $addToSet: { assignedTo: { $each: newEmployeeIds } }, status: 'Assigned' },
       { new: true }
-    ).populate('assignedTo', 'name email team');
+    ).populate('assignedTo', 'name email team')
+     .populate('completedBy', 'name')
+     .populate('acceptedBy', 'name');
 
     if (!updatedTask) {
       return res.status(404).json({ error: 'Task not found or unauthorized.' });
@@ -104,7 +117,8 @@ const getTasks = async (req, res) => {
 
     const tasks = await Task.find({ companyId })
       .populate('assignedTo', 'name email team')
-      .populate('completedBy', 'name');
+      .populate('completedBy', 'name')
+      .populate('acceptedBy', 'name');
 
     res.json(tasks);
   } catch (err) {
@@ -133,16 +147,24 @@ const updateTaskStatus = async (req, res) => {
     let updateFields = {};
 
     if (status === 'In Progress') {
+      await Task.findByIdAndUpdate(taskId, { $addToSet: { acceptedBy: userId } });
       updateFields.status = 'In Progress';
       if (!task.acceptedAt) updateFields.acceptedAt = new Date();
     } else if (status === 'Completed') {
       const alreadyCompleted = task.completedBy.some(id => id.toString() === userId.toString());
       if (!alreadyCompleted) {
-        await Task.findByIdAndUpdate(taskId, { $addToSet: { completedBy: userId } });
+        // Also ensure user is in acceptedBy when completing, for status consistency
+        await Task.findByIdAndUpdate(taskId, { 
+          $addToSet: { 
+            completedBy: userId,
+            acceptedBy: userId
+          } 
+        });
 
         const updatedTaskCheck = await Task.findById(taskId)
           .populate('assignedTo', 'name email team')
-          .populate('completedBy', 'name');
+          .populate('completedBy', 'name')
+          .populate('acceptedBy', 'name');
 
         const totalAssigned = updatedTaskCheck.assignedTo.length;
         const totalCompleted = updatedTaskCheck.completedBy.length;
@@ -162,7 +184,8 @@ const updateTaskStatus = async (req, res) => {
 
     const finalTask = await Task.findByIdAndUpdate(taskId, updateFields, { new: true })
       .populate('assignedTo', 'name email team')
-      .populate('completedBy', 'name');
+      .populate('completedBy', 'name')
+      .populate('acceptedBy', 'name');
 
     const io = req.app.get('socketio');
     if (io) {
@@ -212,7 +235,8 @@ const editTask = async (req, res) => {
       { title, description, deadline },
       { new: true }
     ).populate('assignedTo', 'name email team')
-     .populate('completedBy', 'name');
+     .populate('completedBy', 'name')
+     .populate('acceptedBy', 'name');
 
     const io = req.app.get('socketio');
     if (io) {
@@ -248,7 +272,8 @@ const addComment = async (req, res) => {
       { new: true }
     ).populate('comments.user', 'name')
      .populate('assignedTo', 'name email team')
-     .populate('completedBy', 'name');
+     .populate('completedBy', 'name')
+     .populate('acceptedBy', 'name');
 
     const io = req.app.get('socketio');
     if (io) {
@@ -268,6 +293,7 @@ const getTaskById = async (req, res) => {
     const task = await Task.findOne({ _id: req.params.id, companyId: req.user.companyId })
       .populate('assignedTo', 'name email team')
       .populate('completedBy', 'name')
+      .populate('acceptedBy', 'name')
       .populate('comments.user', 'name');
 
     if (!task) {
