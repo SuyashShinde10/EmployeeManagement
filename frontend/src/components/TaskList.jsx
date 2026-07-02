@@ -66,105 +66,133 @@ const TaskList = ({ tasks, onTaskUpdate }) => {
           const daysLeft = Math.abs(Math.ceil((new Date(task.deadline) - new Date()) / (1000 * 60 * 60 * 24)));
 
           return (
-            <div key={task._id} className="ts-task-card">
-              {/* Status + Actions Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span className={badgeClass}>{displayStatus}</span>
-                {role === 'PM' && (
-                  <button
-                    className="ts-btn ts-btn-danger ts-btn-sm"
-                    style={{ padding: '3px 8px', fontSize: '0.75rem' }}
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(task._id); }}
-                  >
-                    Delete
-                  </button>
-                )}
+            <div key={task._id} className="ts-task-card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Header: Title and Badge/Delete */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h6 style={{ fontWeight: 700, fontSize: '1.1rem', margin: 0, lineHeight: 1.3 }}>
+                    <Link
+                      to={`/task/${task._id}`}
+                      style={{ color: 'var(--text)', textDecoration: 'none' }}
+                      onMouseOver={e => e.target.style.color = 'var(--accent)'}
+                      onMouseOut={e => e.target.style.color = 'var(--text)'}
+                    >
+                      {task.title}
+                    </Link>
+                  </h6>
+                </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '3px 8px', fontSize: '0.75rem' }}>
+                    Team Task
+                  </span>
+                  {role === 'PM' && (
+                    <button
+                      className="ts-btn ts-btn-danger ts-btn-sm"
+                      style={{ padding: '3px 8px', fontSize: '0.75rem' }}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(task._id); }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
-
-              {/* Title */}
-              <h6 style={{ fontWeight: 700, fontSize: '0.95rem', margin: '0 0 6px', lineHeight: 1.4 }}>
-                <Link
-                  to={`/task/${task._id}`}
-                  style={{ color: 'var(--text)', textDecoration: 'none' }}
-                  onMouseOver={e => e.target.style.color = 'var(--accent)'}
-                  onMouseOut={e => e.target.style.color = 'var(--text)'}
-                >
-                  {task.title}
-                </Link>
-              </h6>
 
               {/* Description */}
               <p style={{
-                fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 auto',
-                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                overflow: 'hidden', lineHeight: 1.5, paddingBottom: 12
+                fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0,
+                display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
+                overflow: 'hidden', lineHeight: 1.5
               }}>
                 {task.description || 'No description.'}
               </p>
 
-              {/* Footer */}
-              <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-                {/* Assignees + Deadline */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  {/* Avatar stack */}
-                   <div style={{ display: 'flex' }}>
-                    {task.assignedTo.length > 0 ? (
-                      task.assignedTo.slice(0, 4).map((u, i) => {
-                        const isDone = task.completedBy?.some(c => (c._id || c).toString() === u._id.toString());
-                        const isWorking = task.acceptedBy?.some(a => (a._id || a).toString() === u._id.toString());
-                        
-                        let dotColor = '#9ca3af'; // Pending
-                        let statusText = 'Pending';
-                        if (isDone) {
-                          dotColor = '#10b981'; // Done
-                          statusText = 'Done';
-                        } else if (isWorking) {
-                          dotColor = '#f59e0b'; // Working
-                          statusText = 'Working';
-                        }
-
-                        return (
-                          <div
-                            key={u._id}
-                            title={`${u.name} (${statusText})`}
-                            style={{
-                              width: 26, height: 26,
-                              borderRadius: '50%',
-                              background: 'var(--accent-light)',
-                              color: 'var(--accent)',
-                              fontSize: '0.65rem', fontWeight: 700,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              border: '2px solid var(--surface)',
-                              marginLeft: i > 0 ? -8 : 0,
-                              zIndex: 4 - i,
-                              position: 'relative'
-                            }}
-                          >
-                            {u.name.charAt(0)}
-                            <div style={{
-                              position: 'absolute',
-                              top: -2,
-                              right: -2,
-                              width: 8,
-                              height: 8,
-                              borderRadius: '50%',
-                              background: dotColor,
-                              border: '1.5px solid var(--surface)'
-                            }} />
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontStyle: 'italic' }}>Unassigned</span>
-                    )}
+              {/* Assigned & Deadline Dates Box */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                padding: '12px 16px',
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                marginTop: 4
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    Assigned
                   </div>
-
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isExpired ? 'var(--danger)' : 'var(--text-muted)' }}>
-                    {isExpired ? `${daysLeft}d overdue` : `${daysLeft}d left`}
-                  </span>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)', marginTop: 4 }}>
+                    {new Date(task.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
                 </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    Deadline
+                  </div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: isExpired ? 'var(--danger)' : 'var(--text)', marginTop: 4 }}>
+                    {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                </div>
+              </div>
 
-                {/* Action buttons */}
+              {/* Team Members & Status Section */}
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Team Members & Status
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 110, overflowY: 'auto', paddingRight: 4 }}>
+                  {task.assignedTo.length > 0 ? (
+                    task.assignedTo.map(u => {
+                      const isMe = u._id === currentUserId;
+                      const isDone = task.completedBy?.some(c => (c._id || c).toString() === u._id.toString());
+                      const isWorking = task.acceptedBy?.some(a => (a._id || a).toString() === u._id.toString());
+
+                      let statusText = 'Pending';
+                      let statusClass = 'ts-badge-pending';
+                      if (isDone) {
+                        statusText = 'Done';
+                        statusClass = 'ts-badge-completed';
+                      } else if (isWorking) {
+                        statusText = 'Working';
+                        statusClass = 'ts-badge-progress';
+                      }
+
+                      return (
+                        <div key={u._id} style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '8px 12px',
+                          borderRadius: 'var(--radius)',
+                          background: 'var(--surface-2)',
+                          border: '1px solid var(--border)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text)' }}>
+                              {u.name}
+                            </span>
+                            <span className="ts-badge" style={{
+                              fontSize: '0.6rem',
+                              padding: '1px 5px',
+                              background: isMe ? 'var(--accent-light)' : 'var(--border)',
+                              color: isMe ? 'var(--accent)' : 'var(--text-muted)'
+                            }}>
+                              {isMe ? 'You' : 'Team Member'}
+                            </span>
+                          </div>
+                          <span className={`ts-badge ${statusClass}`} style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
+                            {statusText}
+                          </span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontStyle: 'italic' }}>No members assigned</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons Footer */}
+              <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {role === 'PM' && (
                     <>
