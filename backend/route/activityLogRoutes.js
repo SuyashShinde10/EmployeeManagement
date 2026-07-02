@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const activityLogController = require('../controller/activityLogController');
-const { protect } = require('../middleware/authMiddleware');
+const { requireAuth: protect } = require('../middleware/requireAuth');
 
 router.get('/', protect, activityLogController.getActivityLogs);
 
