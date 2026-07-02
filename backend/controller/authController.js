@@ -59,7 +59,7 @@ const registerCompany = async (req, res) => {
       name: hrName,
       email,
       password,         // pre-save hook will hash this
-      role: 'HR',
+      role: 'PM',
       companyId: savedCompany._id,
       status: 'Active'
     });
@@ -145,7 +145,7 @@ const login = async (req, res) => {
     }
 
     if (user.status === 'Resigned') {
-      return res.status(403).json({ message: 'Account deactivated. Contact your HR.' });
+      return res.status(403).json({ message: 'Account deactivated. Contact your Project Manager.' });
     }
 
     const token = createToken(user._id);

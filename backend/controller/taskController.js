@@ -16,7 +16,17 @@ const createTask = async (req, res) => {
 
     const task = new Task({ title, description, companyId, deadline });
     const result = await task.save();
-    res.status(201).json(result);
+
+    const populatedTask = await Task.findById(result._id)
+      .populate('assignedTo', 'name email team')
+      .populate('completedBy', 'name');
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(companyId.toString()).emit('task_created', populatedTask);
+    }
+
+    res.status(201).json(populatedTask);
   } catch (err) {
     console.error('[createTask]', err);
     res.status(500).json({ error: 'Failed to create task.' });
@@ -69,6 +79,11 @@ const assignTask = async (req, res) => {
 
     if (!updatedTask) {
       return res.status(404).json({ error: 'Task not found or unauthorized.' });
+    }
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(companyId.toString()).emit('task_updated', updatedTask);
     }
 
     res.json(updatedTask);
@@ -125,7 +140,10 @@ const updateTaskStatus = async (req, res) => {
       if (!alreadyCompleted) {
         await Task.findByIdAndUpdate(taskId, { $addToSet: { completedBy: userId } });
 
-        const updatedTaskCheck = await Task.findById(taskId);
+        const updatedTaskCheck = await Task.findById(taskId)
+          .populate('assignedTo', 'name email team')
+          .populate('completedBy', 'name');
+
         const totalAssigned = updatedTaskCheck.assignedTo.length;
         const totalCompleted = updatedTaskCheck.completedBy.length;
 
@@ -133,6 +151,10 @@ const updateTaskStatus = async (req, res) => {
           updateFields.status = 'Completed';
           updateFields.completedAt = new Date();
         } else {
+          const io = req.app.get('socketio');
+          if (io) {
+            io.to(task.companyId.toString()).emit('task_updated', updatedTaskCheck);
+          }
           return res.json(updatedTaskCheck);
         }
       }
@@ -141,6 +163,11 @@ const updateTaskStatus = async (req, res) => {
     const finalTask = await Task.findByIdAndUpdate(taskId, updateFields, { new: true })
       .populate('assignedTo', 'name email team')
       .populate('completedBy', 'name');
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(task.companyId.toString()).emit('task_updated', finalTask);
+    }
 
     res.json(finalTask);
   } catch (err) {
@@ -157,6 +184,12 @@ const deleteTask = async (req, res) => {
       return res.status(404).json({ error: 'Task not found or unauthorized.' });
     }
     await Task.findByIdAndDelete(req.params.id);
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(task.companyId.toString()).emit('task_deleted', req.params.id);
+    }
+
     res.json({ message: 'Task deleted.' });
   } catch (err) {
     console.error('[deleteTask]', err);
@@ -178,7 +211,14 @@ const editTask = async (req, res) => {
       req.params.id,
       { title, description, deadline },
       { new: true }
-    );
+    ).populate('assignedTo', 'name email team')
+     .populate('completedBy', 'name');
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(task.companyId.toString()).emit('task_updated', updatedTask);
+    }
+
     res.json(updatedTask);
   } catch (err) {
     console.error('[editTask]', err);
@@ -206,7 +246,14 @@ const addComment = async (req, res) => {
       taskId,
       { $push: { comments: { user: userId, text: text.trim() } } },
       { new: true }
-    ).populate('comments.user', 'name');
+    ).populate('comments.user', 'name')
+     .populate('assignedTo', 'name email team')
+     .populate('completedBy', 'name');
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(task.companyId.toString()).emit('task_updated', updatedTask);
+    }
 
     res.json(updatedTask);
   } catch (err) {

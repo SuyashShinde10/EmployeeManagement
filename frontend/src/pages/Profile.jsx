@@ -69,7 +69,7 @@ const Profile = () => {
             <p style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>
               {formData.name}
             </p>
-            <span className={`ts-badge ${role === 'HR' ? 'ts-badge-hr' : 'ts-badge-emp'}`}>
+            <span className={`ts-badge ${role === 'PM' ? 'ts-badge-pm' : 'ts-badge-emp'}`}>
               {role}
             </span>
           </div>

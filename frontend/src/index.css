@@ -172,7 +172,8 @@ body {
 .ts-badge-progress   { background: var(--warning-light); color: var(--warning); }
 .ts-badge-completed  { background: var(--success-light); color: var(--success); }
 .ts-badge-expired    { background: var(--danger-light); color: var(--danger); }
-.ts-badge-hr         { background: var(--accent-light); color: var(--accent); }
+.ts-badge-hr,
+.ts-badge-pm         { background: var(--accent-light); color: var(--accent); }
 .ts-badge-emp        { background: var(--surface-2); color: var(--text-muted); }
 
 /* ─── Navbar ─────────────────────────────────────────────────────────── */

@@ -43,7 +43,7 @@ const Navbar = () => {
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
                 {name}
               </span>
-              <span className={`ts-badge ${role === 'HR' ? 'ts-badge-hr' : 'ts-badge-emp'}`}
+              <span className={`ts-badge ${role === 'PM' ? 'ts-badge-pm' : 'ts-badge-emp'}`}
                     style={{ marginTop: 2 }}>
                 {role}
               </span>

@@ -30,13 +30,13 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-// ─── requireHR ───────────────────────────────────────────────────────────────
-// Must be used AFTER requireAuth — blocks non-HR users
-const requireHR = (req, res, next) => {
-  if (!req.user || req.user.role !== 'HR') {
-    return res.status(403).json({ error: 'Access restricted to HR accounts.' });
+// ─── requirePM ───────────────────────────────────────────────────────────────
+// Must be used AFTER requireAuth — blocks non-PM users
+const requirePM = (req, res, next) => {
+  if (!req.user || req.user.role !== 'PM') {
+    return res.status(403).json({ error: 'Access restricted to Project Manager accounts.' });
   }
   next();
 };
 
-module.exports = { requireAuth, requireHR };
+module.exports = { requireAuth, requirePM, requireHR: requirePM };

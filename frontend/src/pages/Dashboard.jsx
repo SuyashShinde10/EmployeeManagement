@@ -8,6 +8,8 @@ import CreateTask from '../components/CreateTask';
 import EmployeeList from '../components/EmployeeList';
 import TaskFilters from '../components/TaskFilters';
 import TaskList from '../components/TaskList';
+import { socket } from '../socket';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -35,12 +37,42 @@ const Dashboard = () => {
     fetchTasks();
   }, [refreshTrigger, companyId, navigate]);
 
+  useEffect(() => {
+    if (!companyId) return;
+
+    socket.connect();
+    socket.emit('join_company', companyId);
+
+    socket.on('task_created', (newTask) => {
+      setTasks(prev => {
+        if (prev.some(t => t._id === newTask._id)) return prev;
+        return [...prev, newTask];
+      });
+      toast.info(`New task created: "${newTask.title}"`);
+    });
+
+    socket.on('task_updated', (updatedTask) => {
+      setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t));
+    });
+
+    socket.on('task_deleted', (deletedTaskId) => {
+      setTasks(prev => prev.filter(t => t._id !== deletedTaskId));
+    });
+
+    return () => {
+      socket.off('task_created');
+      socket.off('task_updated');
+      socket.off('task_deleted');
+      socket.disconnect();
+    };
+  }, [companyId]);
+
   const refreshData = () => setRefreshTrigger(prev => prev + 1);
 
   const filteredTasks = tasks.filter(task => {
     const matchSearch = task.title.toLowerCase().includes(filters.search.toLowerCase());
     const matchStatus = filters.status === 'All' || task.status === filters.status;
-    const isVisible   = role === 'HR' || task.assignedTo.some(u => u._id === userId);
+    const isVisible   = role === 'PM' || task.assignedTo.some(u => u._id === userId);
     return matchSearch && matchStatus && isVisible;
   });
 
@@ -102,15 +134,15 @@ const Dashboard = () => {
             {greeting}, {name.split(' ')[0]}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            {role === 'HR' ? 'Here\'s your company overview.' : 'Here are your assigned tasks.'}
+            {role === 'PM' ? 'Here\'s your company overview.' : 'Here are your assigned tasks.'}
           </p>
         </div>
 
         {/* Stats */}
-        <DashboardStats tasks={role === 'HR' ? tasks : filteredTasks} />
+        <DashboardStats tasks={role === 'PM' ? tasks : filteredTasks} />
 
-        {/* HR Management Section */}
-        {role === 'HR' && (
+        {/* PM Management Section */}
+        {role === 'PM' && (
           <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, marginBottom: 28 }}>
             {/* Left sidebar: forms */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -118,7 +150,7 @@ const Dashboard = () => {
               <CreateTask refreshTasks={refreshData} />
             </div>
             {/* Right: employee directory */}
-            <EmployeeList refreshTrigger={refreshTrigger} />
+            <EmployeeList refreshTrigger={refreshTrigger} tasks={tasks} />
           </div>
         )}
 
@@ -126,7 +158,7 @@ const Dashboard = () => {
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-              {role === 'HR' ? 'Task Board' : 'My Tasks'}
+              {role === 'PM' ? 'Task Board' : 'My Tasks'}
             </h2>
           </div>
           <TaskFilters filters={filters} setFilters={setFilters} />

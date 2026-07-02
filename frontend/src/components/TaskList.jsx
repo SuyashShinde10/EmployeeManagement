@@ -70,7 +70,7 @@ const TaskList = ({ tasks, onTaskUpdate }) => {
               {/* Status + Actions Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <span className={badgeClass}>{displayStatus}</span>
-                {role === 'HR' && (
+                {role === 'PM' && (
                   <button
                     className="ts-btn ts-btn-danger ts-btn-sm"
                     style={{ padding: '3px 8px', fontSize: '0.75rem' }}
@@ -141,7 +141,7 @@ const TaskList = ({ tasks, onTaskUpdate }) => {
 
                 {/* Action buttons */}
                 <div style={{ display: 'flex', gap: 6 }}>
-                  {role === 'HR' && (
+                  {role === 'PM' && (
                     <>
                       <button className="ts-btn ts-btn-ghost ts-btn-sm" style={{ flex: 1 }}
                               onClick={() => setEditModalTask(task)}>

@@ -112,11 +112,49 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'An unexpected error occurred.' });
 });
 
-// ─── 10. Server Startup ───────────────────────────────────────────────────────
+// ─── 10. Socket.io Integration ────────────────────────────────────────────────
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true
+  }
+});
+
+// Save socket.io instance to Express app settings
+app.set('socketio', io);
+
+io.on('connection', (socket) => {
+  console.log('⚡ Client connected:', socket.id);
+
+  // Clients join a room specifically for their company
+  socket.on('join_company', (companyId) => {
+    if (companyId) {
+      socket.join(companyId.toString());
+      console.log(`👤 Client ${socket.id} joined company room: ${companyId}`);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('🔌 Client disconnected:', socket.id);
+  });
+});
+
+// ─── 11. Server Startup ───────────────────────────────────────────────────────
 const PORT = process.env.PORT || 8000;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
 }

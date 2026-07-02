@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { requireAuth, requireHR } = require('../middleware/requireAuth');
+const { requireAuth, requirePM } = require('../middleware/requireAuth');
 
 const {
   registerCompany,
@@ -15,10 +15,10 @@ const {
 router.post('/register-company', registerCompany);
 router.post('/login', login);
 
-// ─── HR-only Routes (requireAuth + requireHR) ─────────────────────────────────
-router.post('/create-employee',     requireAuth, requireHR, createEmployee);
-router.put('/employee/edit/:id',    requireAuth, requireHR, editEmployee);
-router.put('/employee/delete/:id',  requireAuth, requireHR, deleteEmployee);
+// ─── PM-only Routes (requireAuth + requirePM) ─────────────────────────────────
+router.post('/create-employee',     requireAuth, requirePM, createEmployee);
+router.put('/employee/edit/:id',    requireAuth, requirePM, editEmployee);
+router.put('/employee/delete/:id',  requireAuth, requirePM, deleteEmployee);
 
 // ─── Authenticated User Routes ────────────────────────────────────────────────
 // updateProfile uses req.user._id from token — the :id param is ignored for ownership

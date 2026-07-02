@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
+import { socket } from '../socket';
 
 const STATUS_BADGE = {
   Pending:       'ts-badge ts-badge-pending',
@@ -18,6 +19,8 @@ const TaskDetails = () => {
   const userId   = localStorage.getItem('userId');
   const role     = localStorage.getItem('role');
 
+  const companyId = localStorage.getItem('companyId');
+
   const [task, setTask]         = useState(null);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -31,7 +34,27 @@ const TaskDetails = () => {
     }
   };
 
-  useEffect(() => { fetchTask(); }, [id]);
+  useEffect(() => {
+    fetchTask();
+  }, [id]);
+
+  useEffect(() => {
+    if (!companyId) return;
+
+    socket.connect();
+    socket.emit('join_company', companyId);
+
+    socket.on('task_updated', (updatedTask) => {
+      if (updatedTask._id === id) {
+        setTask(updatedTask);
+      }
+    });
+
+    return () => {
+      socket.off('task_updated');
+      socket.disconnect();
+    };
+  }, [companyId, id]);
 
   const handleComment = async (e) => {
     e.preventDefault();
@@ -162,7 +185,7 @@ const TaskDetails = () => {
             </div>
 
             {/* Discussion */}
-            {role !== 'HR' && (
+            {role !== 'PM' && (
               <div className="ts-surface" style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
                   <span className="ts-section-title">Discussion</span>

@@ -161,7 +161,7 @@ const Home = () => {
                 Register your Workspace
               </h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
-                HR managers sign up to create a dedicated company space. All database records and tasks will be private to your organization.
+                Project Managers sign up to create a dedicated company space. All database records and tasks will be private to your organization.
               </p>
             </div>
 
@@ -172,7 +172,7 @@ const Home = () => {
                 Securely Onboard Employees
               </h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
-                Instead of manual password setup, the system generates a random key returned once to HR. Employees log in using this key and can update their profiles safely.
+                Instead of manual password setup, the system generates a random key returned once to PM. Employees log in using this key and can update their profiles safely.
               </p>
             </div>
 
@@ -183,7 +183,7 @@ const Home = () => {
                 Assign & Track Tasks
               </h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
-                HR creates and assigns tasks to department teams. Employees accept, update progress, and coordinate via internal task discussion threads.
+                PM creates and assigns tasks to department teams. Employees accept, update progress, and coordinate via internal task discussion threads.
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ const Home = () => {
                   Role-Based Views
                 </h4>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
-                  HR accounts get administrative control over staff lists and task creation, while Employees focus purely on their active dashboard tasks.
+                  PM accounts get administrative control over staff lists and task creation, while Employees focus purely on their active dashboard tasks.
                 </p>
               </div>
             </div>

@@ -66,7 +66,7 @@ const Register = () => {
             Create your workspace
           </h1>
           <p style={{ margin: '0 0 24px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Set up your company and HR account in seconds.
+            Set up your company and PM account in seconds.
           </p>
 
           {error && (
