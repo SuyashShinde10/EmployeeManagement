@@ -103,7 +103,8 @@ const createEmployee = async (req, res) => {
       role: 'Employee',
       companyId: hrCompanyId,
       team: team || 'General',
-      status: 'Active'
+      status: 'Active',
+      isPasswordTemp: true
     });
 
     await newEmployee.save();
@@ -155,7 +156,8 @@ const login = async (req, res) => {
       userId: user._id,
       name: user.name,
       role: user.role,
-      companyId: user.companyId
+      companyId: user.companyId,
+      isPasswordTemp: user.isPasswordTemp
     });
   } catch (err) {
     console.error('[login]', err);
@@ -216,6 +218,7 @@ const updateProfile = async (req, res) => {
         return res.status(400).json({ error: 'Password must be at least 8 characters.' });
       }
       updateData.password = password; // schema pre-update hook hashes it
+      updateData.isPasswordTemp = false;
     }
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');

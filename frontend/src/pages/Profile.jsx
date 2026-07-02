@@ -35,6 +35,9 @@ const Profile = () => {
       });
       toast.success('Profile updated!');
       localStorage.setItem('name', res.data.user.name);
+      if (formData.password) {
+        localStorage.setItem('isPasswordTemp', 'false');
+      }
       setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
     } catch (err) {
       toast.error(err.response?.data?.error || 'Update failed.');

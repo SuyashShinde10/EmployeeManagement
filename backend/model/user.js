@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Resigned'],
     default: 'Active'
+  },
+  isPasswordTemp: {
+    type: Boolean,
+    default: false
   }
 });
 

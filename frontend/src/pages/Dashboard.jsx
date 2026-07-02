@@ -48,11 +48,53 @@ const Dashboard = () => {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
+  const isPasswordTemp = localStorage.getItem('isPasswordTemp') === 'true';
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
 
       <div style={{ padding: '28px 32px', maxWidth: 1400, margin: '0 auto' }}>
+        
+        {/* Password Warning Banner */}
+        {isPasswordTemp && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'var(--accent-light)',
+            border: '1px solid var(--accent)',
+            color: 'var(--accent)',
+            padding: '12px 18px',
+            borderRadius: 'var(--radius)',
+            marginBottom: 24,
+            fontSize: '0.85rem',
+            fontWeight: 500
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: '1rem' }}>🔒</span>
+              <span>You are using a temporary password. Secure your account by setting a new password.</span>
+            </div>
+            <button
+              onClick={() => navigate('/profile')}
+              style={{
+                background: 'var(--accent)',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Set Password
+            </button>
+          </div>
+        )}
 
         {/* Page Header */}
         <div style={{ marginBottom: 24 }}>

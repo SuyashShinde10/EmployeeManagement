@@ -21,6 +21,7 @@ const Login = () => {
         localStorage.setItem('companyId', res.data.companyId);
         localStorage.setItem('role',      res.data.role);
         localStorage.setItem('name',      res.data.name);
+        localStorage.setItem('isPasswordTemp', res.data.isPasswordTemp ? 'true' : 'false');
         navigate('/dashboard');
       }
     } catch (err) {
