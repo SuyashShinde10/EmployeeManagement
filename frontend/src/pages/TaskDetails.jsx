@@ -4,6 +4,7 @@ import api from '../api';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
 import { socket, isSocketSupported } from '../socket';
+import { Paperclip, CheckSquare, Square, Plus, File, Download, Loader } from 'lucide-react';
 
 const STATUS_BADGE = {
   Pending:       'ts-badge ts-badge-pending',
@@ -24,6 +25,8 @@ const TaskDetails = () => {
   const [task, setTask]         = useState(null);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [newSubtask, setNewSubtask] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const fetchTask = async () => {
     try {
@@ -101,6 +104,48 @@ const TaskDetails = () => {
       fetchTask();
     } catch (err) {
       toast.error('Status update failed.');
+    }
+  };
+
+  const handleAddSubtask = async (e) => {
+    e.preventDefault();
+    if (!newSubtask.trim()) return;
+    try {
+      await api.post(`/task/${id}/subtask`, { title: newSubtask });
+      setNewSubtask('');
+      fetchTask();
+      toast.success('Subtask added.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to add subtask.');
+    }
+  };
+
+  const handleToggleSubtask = async (subtaskId) => {
+    try {
+      await api.put(`/task/${id}/subtask/${subtaskId}/toggle`);
+      fetchTask();
+    } catch (err) {
+      toast.error('Failed to toggle subtask.');
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    setUploading(true);
+    try {
+      await api.post(`/task/${id}/attachment`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      fetchTask();
+      toast.success('File uploaded.');
+    } catch (err) {
+      toast.error('Failed to upload file.');
+    } finally {
+      setUploading(false);
+      e.target.value = null; // reset input
     }
   };
 
@@ -229,6 +274,79 @@ const TaskDetails = () => {
                     </span>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Subtasks Section */}
+            <div className="ts-surface" style={{ padding: 24 }}>
+              <span className="ts-section-title" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                <CheckSquare size={18} /> Checklists
+              </span>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                {task.subtasks?.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>No subtasks.</p>
+                ) : (
+                  task.subtasks?.map(st => (
+                    <div key={st._id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', background: 'var(--surface-2)', borderRadius: 6, border: '1px solid var(--border)' }}>
+                      <div onClick={() => handleToggleSubtask(st._id)} style={{ cursor: 'pointer', color: st.isCompleted ? 'var(--success)' : 'var(--text-subtle)', display: 'flex' }}>
+                        {st.isCompleted ? <CheckSquare size={18} /> : <Square size={18} />}
+                      </div>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text)', textDecoration: st.isCompleted ? 'line-through' : 'none', opacity: st.isCompleted ? 0.6 : 1 }}>
+                        {st.title}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {role === 'PM' && (
+                <form onSubmit={handleAddSubtask} style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    className="ts-input"
+                    style={{ flex: 1, padding: '8px 12px' }}
+                    placeholder="Add a new subtask..."
+                    value={newSubtask}
+                    onChange={(e) => setNewSubtask(e.target.value)}
+                  />
+                  <button type="submit" className="ts-btn ts-btn-primary" disabled={!newSubtask.trim()} style={{ padding: '0 12px' }}>
+                    <Plus size={18} />
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Attachments Section */}
+            <div className="ts-surface" style={{ padding: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <span className="ts-section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Paperclip size={18} /> Attachments
+                </span>
+                
+                <label className="ts-btn ts-btn-ghost ts-btn-sm" style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}>
+                  {uploading ? <Loader size={16} className="spinner" /> : <Plus size={16} />} 
+                  <span style={{ marginLeft: 6 }}>{uploading ? 'Uploading...' : 'Add File'}</span>
+                  <input type="file" style={{ display: 'none' }} onChange={handleFileUpload} disabled={uploading} />
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+                {task.attachments?.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>No attachments yet.</p>
+                ) : (
+                  task.attachments?.map(att => (
+                    <a key={att._id} href={att.url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: 'var(--surface-2)', borderRadius: 8, border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--text)' }}>
+                      <div style={{ background: 'var(--primary-light)', color: 'var(--primary)', padding: 8, borderRadius: 6, display: 'flex' }}>
+                        <File size={20} />
+                      </div>
+                      <div style={{ overflow: 'hidden' }}>
+                        <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {att.filename}
+                        </p>
+                      </div>
+                    </a>
+                  ))
+                )}
               </div>
             </div>
 

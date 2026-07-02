@@ -152,6 +152,41 @@ const Analytics = () => {
     );
   };
 
+  const renderXPRulesCard = () => {
+    return (
+      <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', height: 'fit-content', border: '1px solid var(--border)' }}>
+        <h4 style={{ margin: '0 0 12px', fontSize: '1rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          🏆 XP Scoring Guide
+        </h4>
+        <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+          Rankings are calculated dynamically based on task contributions and timeline compliance:
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Complete Individual Task</span>
+            <span style={{ fontWeight: 700, color: 'var(--success)' }}>+10 XP</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Complete Team Task</span>
+            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>+15 XP</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text-muted)' }}>On-Time Completion Bonus</span>
+            <span style={{ fontWeight: 700, color: 'var(--success)' }}>+5 XP</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Fast Delivery Bonus (&lt;24h)</span>
+            <span style={{ fontWeight: 700, color: 'var(--success)' }}>+5 XP</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Overdue Penalty</span>
+            <span style={{ fontWeight: 700, color: 'var(--danger)' }}>-3 XP</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
       <Navbar />
@@ -262,8 +297,10 @@ const Analytics = () => {
               {renderSVGChart()}
             </div>
 
-            {/* Leaderboard Table */}
-            <div className="ts-surface" style={{ padding: 24, overflowX: 'auto' }}>
+            {/* Leaderboard & XP Rules Layout */}
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+              {/* Leaderboard Table */}
+              <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', flex: '1 1 650px', margin: 0 }}>
               <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Employee Performance Leaderboard</h3>
               
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 600 }}>
@@ -351,6 +388,8 @@ const Analytics = () => {
                 </tbody>
               </table>
             </div>
+            {renderXPRulesCard()}
+          </div>
           </div>
         )}
 
@@ -418,16 +457,21 @@ const Analytics = () => {
               </div>
             )}
 
-            {/* SVG Trend Chart Card */}
-            <div className="ts-surface" style={{ padding: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>My Completion Output</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}>
-                  <span style={{ width: 12, height: 4, background: 'var(--success)', borderRadius: 2 }} />
-                  <span style={{ color: 'var(--text-muted)' }}>Tasks Completed</span>
+            {/* Trend Chart & XP Rules Layout */}
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+              {/* SVG Trend Chart Card */}
+              <div className="ts-surface" style={{ padding: 24, flex: '1 1 650px', margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>My Completion Output</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}>
+                    <span style={{ width: 12, height: 4, background: 'var(--success)', borderRadius: 2 }} />
+                    <span style={{ color: 'var(--text-muted)' }}>Tasks Completed</span>
+                  </div>
                 </div>
+                {renderSVGChart()}
               </div>
-              {renderSVGChart()}
+              {/* XP Scoring Guide */}
+              {renderXPRulesCard()}
             </div>
           </div>
         )}

@@ -4,8 +4,10 @@ const { requireAuth, requirePM } = require('../middleware/requireAuth');
 
 const {
   createTask, searchEmployees, assignTask, getTasks,
-  updateTaskStatus, deleteTask, editTask, addComment, getTaskById
+  updateTaskStatus, deleteTask, editTask, addComment, getTaskById,
+  uploadAttachment, addSubtask, toggleSubtask
 } = require('../controller/taskController');
+const { upload } = require('../config/cloudinary');
 
 // All task routes require a valid JWT
 router.use(requireAuth);
@@ -22,5 +24,10 @@ router.post('/task/create',           requirePM, createTask);
 router.put('/task/assign',            requirePM, assignTask);
 router.delete('/task/:id',            requirePM, deleteTask);
 router.put('/task/edit/:id',          requirePM, editTask);
+router.post('/task/:id/subtask',      requirePM, addSubtask);
+
+// ─── Shared Task Routes (Attachments and Subtasks) ─────────────────────────────
+router.post('/task/:id/attachment',   upload.single('file'), uploadAttachment);
+router.put('/task/:id/subtask/:subtaskId/toggle', toggleSubtask);
 
 module.exports = router;

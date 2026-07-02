@@ -55,6 +55,15 @@ const taskSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     acceptedAt: { type: Date },
     completedAt: { type: Date }
+  }],
+  subtasks: [{
+    title: { type: String, required: true },
+    isCompleted: { type: Boolean, default: false }
+  }],
+  attachments: [{
+    public_id: String,
+    url: String,
+    filename: String
   }]
 
 }, { timestamps: true });

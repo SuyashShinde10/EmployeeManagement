@@ -12,6 +12,10 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const TaskDetails = lazy(() => import('./pages/TaskDetails'));
 const Analytics = lazy(() => import('./pages/Analytics'));
+const Directory = lazy(() => import('./pages/Directory'));
+const CalendarView = lazy(() => import('./pages/CalendarView'));
+const Reviews = lazy(() => import('./pages/Reviews'));
+const ActivityLog = lazy(() => import('./pages/ActivityLog'));
 
 const LoadingSpinner = () => (
   <div className="d-flex justify-content-center align-items-center vh-100">
@@ -68,6 +72,42 @@ function App() {
             element={
               <ProtectedRoute>
                 <TaskDetails />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/directory" 
+            element={
+              <ProtectedRoute>
+                <Directory />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/calendar" 
+            element={
+              <ProtectedRoute>
+                <CalendarView />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/reviews" 
+            element={
+              <ProtectedRoute>
+                <Reviews />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/activity" 
+            element={
+              <ProtectedRoute>
+                <ActivityLog />
               </ProtectedRoute>
             } 
           />

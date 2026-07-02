@@ -114,6 +114,10 @@ app.use('/api/register-company', authLimiter);
 app.use('/api', require('./route/authRoute'));
 app.use('/api', require('./route/taskRoute'));
 app.use('/api/analytics', require('./route/analyticsRoute'));
+app.use('/api/notifications', require('./route/notificationRoutes'));
+app.use('/api/reviews', require('./route/reviewRoutes'));
+app.use('/api/directory', require('./route/directoryRoutes'));
+app.use('/api/activity-logs', require('./route/activityLogRoutes'));
 
 // ─── 7. Health Check ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {

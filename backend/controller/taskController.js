@@ -1,5 +1,6 @@
 const Task = require('../model/task');
 const User = require('../model/user');
+const logActivity = require('../utils/logger');
 
 // ─── 1. Create Task ───────────────────────────────────────────────────────────
 const createTask = async (req, res) => {
@@ -26,6 +27,8 @@ const createTask = async (req, res) => {
     if (io) {
       io.to(companyId.toString()).emit('task_created', populatedTask);
     }
+
+    await logActivity(req.user.id, companyId, 'Created Task', `Task: ${title}`);
 
     res.status(201).json(populatedTask);
   } catch (err) {
@@ -340,7 +343,70 @@ const getTaskById = async (req, res) => {
   }
 };
 
+// ─── 10. File Attachments ───────────────────────────────────────────────────────
+const uploadAttachment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOne({ _id: id, companyId: req.user.companyId });
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const attachment = {
+      public_id: req.file.filename,
+      url: req.file.path,
+      filename: req.file.originalname
+    };
+
+    task.attachments.push(attachment);
+    await task.save();
+
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ─── 11. Subtasks ─────────────────────────────────────────────────────────────
+const addSubtask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+    
+    if (req.user.role !== 'PM') return res.status(403).json({ error: 'Only PMs can add subtasks' });
+
+    const task = await Task.findOneAndUpdate(
+      { _id: id, companyId: req.user.companyId },
+      { $push: { subtasks: { title } } },
+      { new: true }
+    );
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const toggleSubtask = async (req, res) => {
+  try {
+    const { id, subtaskId } = req.params;
+    
+    const task = await Task.findOne({ _id: id, companyId: req.user.companyId });
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+    
+    const subtask = task.subtasks.id(subtaskId);
+    if (!subtask) return res.status(404).json({ error: 'Subtask not found' });
+    
+    subtask.isCompleted = !subtask.isCompleted;
+    await task.save();
+    
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createTask, searchEmployees, assignTask, getTasks,
-  updateTaskStatus, deleteTask, editTask, addComment, getTaskById
+  updateTaskStatus, deleteTask, editTask, addComment, getTaskById,
+  uploadAttachment, addSubtask, toggleSubtask
 };
