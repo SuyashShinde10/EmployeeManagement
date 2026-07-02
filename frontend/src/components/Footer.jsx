@@ -3,64 +3,57 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-top pt-5 pb-3">
-      <div className="container">
-        <div className="row g-4">
-          
-          {/* Column 1: Brand */}
-          <div className="col-lg-4 col-md-6">
-            <h5 className="fw-bold text-primary mb-3">⚡ TeamSync</h5>
-            <p className="text-muted small lh-lg">
-              Streamline your team's workflow with our industry-leading task management platform. 
-              Secure, efficient, and designed for modern collaboration.
+    <footer style={{
+      background: 'var(--surface)',
+      borderTop: '1px solid var(--border)',
+      padding: '40px 24px 24px',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        {/* Row 1: Brand & Nav */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 20,
+          paddingBottom: 24,
+          borderBottom: '1px solid var(--border)'
+        }}>
+          <div>
+            <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', letterSpacing: '-0.5px' }}>
+              TeamSync
+            </span>
+            <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--text-subtle)' }}>
+              Task management for modern, high-velocity teams.
             </p>
-            <div className="d-flex gap-3">
-                <span className="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary" style={{width: 35, height: 35}}>𝕏</span>
-                <span className="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary" style={{width: 35, height: 35}}>in</span>
-                <span className="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary" style={{width: 35, height: 35}}>f</span>
-            </div>
           </div>
-
-          {/* Column 2: Product */}
-          <div className="col-lg-2 col-md-3 col-6">
-            <h6 className="fw-bold mb-3">Product</h6>
-            <ul className="list-unstyled">
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Features</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Pricing</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Integrations</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Changelog</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Company */}
-          <div className="col-lg-2 col-md-3 col-6">
-            <h6 className="fw-bold mb-3">Company</h6>
-            <ul className="list-unstyled">
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">About Us</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Careers</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Blog</Link></li>
-              <li className="mb-2"><Link to="#" className="text-decoration-none text-muted small">Contact</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 4: Legal */}
-          <div className="col-lg-4 col-md-12">
-            <h6 className="fw-bold mb-3">Stay Updated</h6>
-            <p className="text-muted small">Join our newsletter for the latest feature updates.</p>
-            <div className="input-group mb-3">
-                <input type="email" className="form-control border-light bg-light" placeholder="Enter your email" />
-                <button className="btn btn-dark fw-bold">Subscribe</button>
-            </div>
+          
+          <div style={{ display: 'flex', gap: 24 }}>
+            <Link to="/login" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
+              Sign In
+            </Link>
+            <Link to="/register" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
+              Get Started
+            </Link>
           </div>
         </div>
 
-        <hr className="my-4 text-muted opacity-25" />
-
-        <div className="d-flex justify-content-between align-items-center flex-wrap">
-          <small className="text-muted">© 2024 TeamSync Inc. All rights reserved.</small>
-          <div className="d-flex gap-3">
-             <Link to="#" className="text-decoration-none text-muted small">Privacy Policy</Link>
-             <Link to="#" className="text-decoration-none text-muted small">Terms of Service</Link>
+        {/* Row 2: Copyright & Legal */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 12,
+          paddingTop: 24,
+          fontSize: '0.75rem',
+          color: 'var(--text-subtle)'
+        }}>
+          <span>&copy; {new Date().getFullYear()} TeamSync. All rights reserved.</span>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <Link to="#" style={{ color: 'var(--text-subtle)', textDecoration: 'none' }}>Privacy Policy</Link>
+            <Link to="#" style={{ color: 'var(--text-subtle)', textDecoration: 'none' }}>Terms of Service</Link>
           </div>
         </div>
       </div>

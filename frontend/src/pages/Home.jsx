@@ -7,157 +7,273 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="d-flex flex-column min-vh-100 font-sans">
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
 
       {/* HERO SECTION */}
-      <section className="py-5 bg-light" style={{background: 'linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%)'}}>
-        <div className="container text-center py-5">
-          <div className="d-inline-block px-3 py-1 mb-3 rounded-pill bg-primary bg-opacity-10 text-primary small fw-bold">
-            🚀 v2.0 is now live
-          </div>
-          <h1 className="display-3 fw-bold mb-3 text-dark tracking-tight">
-            Manage your team with <br/>
-            <span className="text-primary">clarity and focus.</span>
-          </h1>
-          <p className="lead text-muted mb-5 mx-auto" style={{maxWidth: '600px'}}>
-            TeamSync connects your workflows to your outcomes. The only task management platform designed for modern, high-velocity teams.
-          </p>
-          <div className="d-flex justify-content-center gap-3">
-            <button onClick={() => navigate('/register')} className="btn btn-primary btn-lg fw-bold px-5 shadow-sm" style={{borderRadius: '10px'}}>
-                Start for Free
-            </button>
-            <button onClick={() => navigate('/login')} className="btn btn-white bg-white text-dark border btn-lg fw-bold px-5 shadow-sm" style={{borderRadius: '10px'}}>
-                Live Demo
-            </button>
+      <section style={{
+        padding: '80px 24px 64px',
+        borderBottom: '1px solid var(--border)',
+        background: 'linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%)'
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
+          
+          {/* Left Hero Content */}
+          <div>
+            <div style={{
+              display: 'inline-flex',
+              padding: '4px 12px',
+              borderRadius: '999px',
+              background: 'var(--accent-light)',
+              color: 'var(--accent)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              marginBottom: 16
+            }}>
+              v2.0 Security Release
+            </div>
+            
+            <h1 style={{
+              fontSize: '3rem',
+              fontWeight: 800,
+              letterSpacing: '-1.5px',
+              lineHeight: 1.1,
+              color: 'var(--text)',
+              margin: '0 0 16px'
+            }}>
+              Your team. Clear tasks. <br />
+              <span style={{ color: 'var(--accent)' }}>No chaos.</span>
+            </h1>
+            
+            <p style={{
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              color: 'var(--text-muted)',
+              margin: '0 0 32px',
+              maxWidth: 480
+            }}>
+              A clean, security-hardened task manager designed for modern teams. Secure employee onboarding, role-based workflows, and real-time completion states.
+            </p>
+            
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => navigate('/register')}
+                className="ts-btn ts-btn-primary"
+                style={{ padding: '12px 24px' }}
+              >
+                Get Started
+              </button>
+              <button
+                onClick={() => navigate('/login')}
+                className="ts-btn ts-btn-ghost"
+                style={{ padding: '12px 24px' }}
+              >
+                Sign In
+              </button>
+            </div>
           </div>
 
-          {/* VISUAL DASHBOARD PREVIEW */}
-          <div className="mt-5 mx-auto shadow-lg rounded-3 overflow-hidden border bg-white" style={{maxWidth: '1000px'}}>
-             {/* Fake Browser Bar */}
-             <div className="bg-light border-bottom px-3 py-2 d-flex gap-2">
-                <div className="rounded-circle bg-danger" style={{width:10, height:10}}></div>
-                <div className="rounded-circle bg-warning" style={{width:10, height:10}}></div>
-                <div className="rounded-circle bg-success" style={{width:10, height:10}}></div>
-             </div>
+          {/* Right Hero Content: Realistic App Mockup */}
+          <div className="ts-surface" style={{
+            background: 'var(--surface)',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow)'
+          }}>
+            {/* Window Header */}
+            <div style={{
+              background: 'var(--surface-2)',
+              borderBottom: '1px solid var(--border)',
+              padding: '10px 16px',
+              display: 'flex',
+              gap: 6
+            }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff5f56' }} />
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ffbd2e' }} />
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#27c93f' }} />
+            </div>
 
-             {/* Mock Dashboard UI */}
-             <div className="p-4 text-start" style={{minHeight: '400px'}}>
-                
-                {/* Mock Header */}
-                <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                    <div>
-                        <h5 className="fw-bold mb-0 text-dark">Website Redesign</h5>
-                        <small className="text-muted">Software Project • Q1 2026</small>
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <small className="text-muted me-2 small">Team:</small>
-                        <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border border-white" style={{width:32, height:32, fontSize:'0.7rem', fontWeight:'bold'}}>JD</div>
-                        <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center border border-white" style={{width:32, height:32, fontSize:'0.7rem', fontWeight:'bold', marginLeft: -8}}>AS</div>
-                        <div className="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center border border-white" style={{width:32, height:32, fontSize:'0.7rem', fontWeight:'bold', marginLeft: -8}}>+3</div>
-                    </div>
+            {/* Window Body Mockup */}
+            <div style={{ padding: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)' }}>Web Redesign</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-subtle)' }}>Q1 Sprint</div>
+                </div>
+                <span className="ts-badge ts-badge-progress">In Progress</span>
+              </div>
+
+              {/* Fake Cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* Mock Card 1 */}
+                <div style={{
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  padding: 12,
+                  background: 'var(--bg)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Design System</span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-subtle)' }}>Priya S.</span>
+                  </div>
+                  <div className="ts-progress" style={{ height: 3 }}>
+                    <div className="ts-progress-bar" style={{ width: '100%', background: 'var(--success)' }} />
+                  </div>
                 </div>
 
-                {/* Mock Kanban Board */}
-                <div className="row g-3">
-                    {/* Column 1: Pending */}
-                    <div className="col-md-4">
-                        <div className="bg-light p-3 rounded-3 h-100">
-                            <h6 className="text-uppercase small fw-bold text-secondary mb-3">To Do (2)</h6>
-                            
-                            {/* Card 1 */}
-                            <div className="bg-white p-3 rounded-3 shadow-sm mb-3 border-start border-4 border-secondary card-hover">
-                                <div className="d-flex justify-content-between mb-2">
-                                  <span className="badge bg-secondary text-white" style={{fontSize:'0.6rem'}}>Pending</span>
-                                  <small className="text-muted" style={{fontSize:'0.7rem'}}>#TS-101</small>
-                                </div>
-                                <h6 className="fw-bold text-dark mb-1" style={{fontSize:'0.9rem'}}>Design System</h6>
-                                <p className="text-muted small mb-2" style={{fontSize: '0.75rem', lineHeight: '1.3'}}>Create color palette and typography components.</p>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <small className="text-muted" style={{fontSize:'0.7rem'}}>📅 Tomorrow</small>
-                                    <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style={{width:20, height:20, fontSize:'0.5rem'}}>JD</div>
-                                </div>
-                            </div>
-                            
-                            {/* Card 2 */}
-                            <div className="bg-white p-3 rounded-3 shadow-sm border-start border-4 border-secondary card-hover">
-                                <span className="badge bg-secondary text-white mb-2" style={{fontSize:'0.6rem'}}>Pending</span>
-                                <h6 className="fw-bold text-dark mb-1" style={{fontSize:'0.9rem'}}>Client Meeting</h6>
-                                <div className="d-flex justify-content-between align-items-center mt-2">
-                                    <small className="text-danger fw-bold" style={{fontSize:'0.7rem'}}>! Overdue</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Column 2: In Progress */}
-                    <div className="col-md-4">
-                        <div className="bg-light p-3 rounded-3 h-100">
-                            <h6 className="text-uppercase small fw-bold text-warning mb-3">In Progress (1)</h6>
-                            {/* Card 3 */}
-                            <div className="bg-white p-3 rounded-3 shadow-sm border-start border-4 border-warning card-hover">
-                                <span className="badge bg-warning text-dark mb-2" style={{fontSize:'0.6rem'}}>In Progress</span>
-                                <h6 className="fw-bold text-dark mb-1" style={{fontSize:'0.9rem'}}>API Integration</h6>
-                                <p className="text-muted small mb-2" style={{fontSize:'0.75rem', lineHeight:'1.3'}}>Connect frontend with new endpoints.</p>
-                                <div className="d-flex justify-content-between align-items-center mt-2">
-                                    <small className="text-dark fw-bold" style={{fontSize:'0.7rem'}}>⏳ 2 days left</small>
-                                    <div className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style={{width:20, height:20, fontSize:'0.5rem'}}>AS</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                     {/* Column 3: Completed */}
-                     <div className="col-md-4">
-                        <div className="bg-light p-3 rounded-3 h-100">
-                            <h6 className="text-uppercase small fw-bold text-success mb-3">Completed (1)</h6>
-                            {/* Card 4 */}
-                            <div className="bg-white p-3 rounded-3 shadow-sm border-start border-4 border-success card-hover">
-                                <span className="badge bg-success text-white mb-2" style={{fontSize:'0.6rem'}}>Done</span>
-                                <h6 className="fw-bold text-dark mb-1" style={{fontSize:'0.9rem'}}>Project Setup</h6>
-                                <div className="d-flex justify-content-between align-items-center mt-2">
-                                    <small className="text-success fw-bold" style={{fontSize:'0.7rem'}}>✓ Finished</small>
-                                    <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style={{width:20, height:20, fontSize:'0.5rem'}}>JD</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* Mock Card 2 */}
+                <div style={{
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  padding: 12,
+                  background: 'var(--bg)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>API Implementation</span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-subtle)' }}>Rahul K.</span>
+                  </div>
+                  <div className="ts-progress" style={{ height: 3 }}>
+                    <div className="ts-progress-bar" style={{ width: '40%', background: 'var(--warning)' }} />
+                  </div>
                 </div>
-             </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* HOW TO USE / WORKFLOW SECTION */}
+      <section style={{ padding: '80px 24px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ marginBottom: 48 }}>
+            <span className="ts-label">Workflow</span>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '4px 0 0', color: 'var(--text)' }}>
+              How TeamSync works
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+            {/* Step 1 */}
+            <div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--border-focus)', marginBottom: 12 }}>01</div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 8px', color: 'var(--text)' }}>
+                Register your Workspace
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                HR managers sign up to create a dedicated company space. All database records and tasks will be private to your organization.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--border-focus)', marginBottom: 12 }}>02</div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 8px', color: 'var(--text)' }}>
+                Securely Onboard Employees
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                Instead of manual password setup, the system generates a random key returned once to HR. Employees log in using this key and can update their profiles safely.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--border-focus)', marginBottom: 12 }}>03</div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 8px', color: 'var(--text)' }}>
+                Assign & Track Tasks
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                HR creates and assigns tasks to department teams. Employees accept, update progress, and coordinate via internal task discussion threads.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <section className="py-5 bg-white">
-        <div className="container py-5">
-            <div className="row g-5">
-                {[
-                    { title: "Real-time Tracking", desc: "See who is working on what, instantly. No more status meetings.", icon: "⚡" },
-                    { title: "Secure Collaboration", desc: "Enterprise-grade security with Role-Based Access Control.", icon: "🔒" },
-                    { title: "Smart Workflows", desc: "Automate task assignments and completion logic effortlessly.", icon: "⚙️" }
-                ].map((feature, i) => (
-                    <div className="col-md-4" key={i}>
-                        <div className="p-4 rounded-4 bg-light h-100 border-0">
-                            <div className="fs-1 mb-3">{feature.icon}</div>
-                            <h4 className="fw-bold text-dark">{feature.title}</h4>
-                            <p className="text-muted">{feature.desc}</p>
-                        </div>
-                    </div>
-                ))}
+      {/* CORE FEATURES GRID */}
+      <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ marginBottom: 48 }}>
+            <span className="ts-label">Features</span>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '4px 0 0', color: 'var(--text)' }}>
+              Built for real utility
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</div>
+              <div>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+                  Role-Based Views
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  HR accounts get administrative control over staff lists and task creation, while Employees focus purely on their active dashboard tasks.
+                </p>
+              </div>
             </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</div>
+              <div>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+                  Bcrypt Hashed Passwords
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  Passwords are never stored in raw text format. High salt rounds ensure state-of-the-art protection against credential harvesting.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</div>
+              <div>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+                  Interactive Task Boards
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  Move tasks seamlessly between Pending, In Progress, and Completed status with granular, team-wide progress completion bars.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</div>
+              <div>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+                  Safe Data Restricting
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  Server-side security rules ensure no employee can view, delete, or modify records belonging to other organizations.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* CTA SECTION */}
-      <section className="py-5 text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-         <div className="container text-center py-5">
-            <h2 className="fw-bold mb-3 display-5">Ready to sync your team?</h2>
-            <p className="lead mb-4 opacity-75">Join 10,000+ teams organizing their work with TeamSync.</p>
-            <button onClick={() => navigate('/register')} className="btn btn-light text-primary btn-lg fw-bold px-5" style={{borderRadius: '10px'}}>
-                Get Started Now
-            </button>
-         </div>
+      <section style={{
+        padding: '64px 24px',
+        background: 'var(--accent)',
+        color: '#fff',
+        textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.5px' }}>
+            Ready to organize your team?
+          </h2>
+          <p style={{ fontSize: '0.95rem', margin: '0 0 24px', opacity: 0.9 }}>
+            Join other workspaces coordinating their sprint goals with TeamSync.
+          </p>
+          <button
+            onClick={() => navigate('/register')}
+            className="ts-btn"
+            style={{ background: '#fff', color: 'var(--accent)', padding: '12px 28px', border: 'none' }}
+          >
+            Create Free Account
+          </button>
+        </div>
       </section>
 
       <Footer />
