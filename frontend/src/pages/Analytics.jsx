@@ -285,8 +285,28 @@ const Analytics = () => {
                           <div style={{ fontWeight: 600 }}>{emp.name}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{emp.email}</div>
                         </td>
-                        <td style={{ padding: '14px 8px', color: 'var(--text-muted)' }}>{emp.assignedCount}</td>
-                        <td style={{ padding: '14px 8px', fontWeight: 600, color: 'var(--success)' }}>{emp.completedCount}</td>
+                        <td style={{ padding: '14px 8px' }}>
+                          <div style={{ fontWeight: 600, color: 'var(--text)' }}>{emp.assignedCount}</div>
+                          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                            <span className="ts-badge ts-badge-success" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                              {emp.assignedIndividualCount || 0} Indiv
+                            </span>
+                            <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                              {emp.assignedTeamCount || 0} Team
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '14px 8px' }}>
+                          <div style={{ fontWeight: 700, color: 'var(--success)' }}>{emp.completedCount}</div>
+                          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                            <span className="ts-badge ts-badge-success" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                              {emp.completedIndividualCount || 0} Indiv
+                            </span>
+                            <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                              {emp.completedTeamCount || 0} Team
+                            </span>
+                          </div>
+                        </td>
                         <td style={{ padding: '14px 8px' }}>
                           {emp.completedCount > 0 ? `${emp.avgSpeedDays} days` : '--'}
                         </td>

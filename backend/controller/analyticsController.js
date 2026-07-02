@@ -144,12 +144,22 @@ exports.getPMAnalytics = async (req, res) => {
       const speedScore = avgSpeedDays <= 1 ? 30 : (avgSpeedDays <= 3 ? 20 : (avgSpeedDays <= 7 ? 10 : 0));
       const score = Math.round((completionRatio * 40) + (onTimeRate * 0.3) + speedScore);
 
+      const assignedIndividualCount = assignedTasks.filter(t => t.assignedTo.length <= 1).length;
+      const assignedTeamCount = assignedTasks.filter(t => t.assignedTo.length > 1).length;
+
+      const completedIndividualCount = completedTasks.filter(t => t.assignedTo.length <= 1).length;
+      const completedTeamCount = completedTasks.filter(t => t.assignedTo.length > 1).length;
+
       return {
         _id: emp._id,
         name: emp.name,
         email: emp.email,
         assignedCount: assignedTasks.length,
         completedCount: completedTasks.length,
+        assignedIndividualCount,
+        assignedTeamCount,
+        completedIndividualCount,
+        completedTeamCount,
         onTimeRate,
         avgSpeedDays,
         score
