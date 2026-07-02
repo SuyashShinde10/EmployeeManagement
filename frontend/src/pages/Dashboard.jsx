@@ -173,7 +173,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats */}
-        <DashboardStats tasks={role === 'PM' ? tasks : filteredTasks} />
+        <DashboardStats tasks={tasks} filteredTasks={filteredTasks} role={role} />
 
         {/* PM Management Section */}
         {role === 'PM' && (
