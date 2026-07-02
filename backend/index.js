@@ -91,8 +91,11 @@ app.use(async (req, res, next) => {
 });
 
 // ─── 6. Routes ───────────────────────────────────────────────────────────────
-// Apply rate limiting only to auth endpoints
-app.use('/api', authLimiter, require('./route/authRoute'));
+// Apply rate limiting only to critical authentication endpoints
+app.use('/api/login', authLimiter);
+app.use('/api/register-company', authLimiter);
+
+app.use('/api', require('./route/authRoute'));
 app.use('/api', require('./route/taskRoute'));
 
 // ─── 7. Health Check ─────────────────────────────────────────────────────────
