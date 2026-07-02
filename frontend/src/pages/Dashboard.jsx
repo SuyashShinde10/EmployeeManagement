@@ -8,7 +8,7 @@ import CreateTask from '../components/CreateTask';
 import EmployeeList from '../components/EmployeeList';
 import TaskFilters from '../components/TaskFilters';
 import TaskList from '../components/TaskList';
-import { socket } from '../socket';
+import { socket, isSocketSupported } from '../socket';
 import { toast } from 'react-toastify';
 
 const Dashboard = () => {
@@ -38,7 +38,7 @@ const Dashboard = () => {
   }, [refreshTrigger, companyId, navigate]);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId || !isSocketSupported) return;
 
     socket.connect();
     socket.emit('join_company', companyId);

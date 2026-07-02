@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
-import { socket } from '../socket';
+import { socket, isSocketSupported } from '../socket';
 
 const STATUS_BADGE = {
   Pending:       'ts-badge ts-badge-pending',
@@ -39,7 +39,7 @@ const TaskDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId || !isSocketSupported) return;
 
     socket.connect();
     socket.emit('join_company', companyId);
