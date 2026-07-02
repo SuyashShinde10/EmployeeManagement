@@ -7,6 +7,9 @@ require('dotenv').config();
 
 const app = express();
 
+// Trust Vercel's proxy for express-rate-limit and IP forwarding
+app.set('trust proxy', 1);
+
 // ─── 1. Security Headers (Helmet) ────────────────────────────────────────────
 app.use(helmet());
 
