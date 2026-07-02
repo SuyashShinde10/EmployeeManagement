@@ -71,7 +71,7 @@ const registerCompany = async (req, res) => {
     if (err.code === 11000) {
       return res.status(409).json({ error: 'Company name or email already exists.' });
     }
-    res.status(500).json({ error: 'Registration failed. Please try again.' });
+    res.status(500).json({ error: err.message || 'Registration failed. Please try again.' });
   }
 };
 
@@ -159,7 +159,7 @@ const login = async (req, res) => {
     });
   } catch (err) {
     console.error('[login]', err);
-    res.status(500).json({ message: 'Login failed. Please try again.' });
+    res.status(500).json({ message: err.message || 'Login failed. Please try again.' });
   }
 };
 

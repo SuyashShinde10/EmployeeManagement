@@ -28,7 +28,7 @@ const Register = () => {
       await api.post('/register-company', formData);
       navigate('/login', { state: { registered: true } });
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
