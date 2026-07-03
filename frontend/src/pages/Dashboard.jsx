@@ -38,7 +38,7 @@ const Dashboard = () => {
   }, [refreshTrigger, companyId, navigate]);
 
   useEffect(() => {
-    if (!companyId || !isSocketSupported) return;
+    if (!companyId || !isSocketSupported()) return;
 
     socket.connect();
     socket.emit('join_company', companyId);
