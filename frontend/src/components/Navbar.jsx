@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import api from '../api';
+import { socket, isSocketSupported } from '../socket';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,8 +17,15 @@ const Navbar = () => {
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef(null);
 
+  const companyId = localStorage.getItem('companyId');
+
   useEffect(() => {
     if (token) {
+      if (isSocketSupported()) {
+        socket.connect();
+        socket.emit('join_company', companyId);
+      }
+
       const fetchNotifs = async () => {
         try {
           const res = await api.get('/notifications');
@@ -27,9 +36,27 @@ const Navbar = () => {
       };
       fetchNotifs();
       const interval = setInterval(fetchNotifs, 10000); // Poll every 10s
-      return () => clearInterval(interval);
+      
+      const handleNewNotif = (notif) => {
+        const userId = localStorage.getItem('userId');
+        if (!notif.user || notif.user === userId) {
+          setNotifications((prev) => [notif, ...prev]);
+          toast.info(notif.message);
+        }
+      };
+
+      if (isSocketSupported()) {
+        socket.on('new_notification', handleNewNotif);
+      }
+
+      return () => {
+        clearInterval(interval);
+        if (isSocketSupported()) {
+          socket.off('new_notification', handleNewNotif);
+        }
+      };
     }
-  }, [token]);
+  }, [token, companyId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

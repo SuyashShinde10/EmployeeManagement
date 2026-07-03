@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar';
 import api from '../api';
 import { toast } from 'react-toastify';
 
+import { socket, isSocketSupported } from '../socket';
+
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -22,6 +24,22 @@ const Reviews = () => {
     if (role === 'PM') {
       fetchEmployees();
     }
+
+    const handleNewReview = (review) => {
+      // If we are an employee, only refresh if the review is for us
+      if (role === 'Employee' && review.employee?._id !== localStorage.getItem('userId')) return;
+      fetchReviews();
+    };
+
+    if (isSocketSupported()) {
+      socket.on('new_review', handleNewReview);
+    }
+
+    return () => {
+      if (isSocketSupported()) {
+        socket.off('new_review', handleNewReview);
+      }
+    };
   }, [role]);
 
   const fetchReviews = async () => {

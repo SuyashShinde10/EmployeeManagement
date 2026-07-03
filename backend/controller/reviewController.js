@@ -25,7 +25,26 @@ exports.createReview = async (req, res) => {
     });
     
     await review.save();
-    res.status(201).json(review);
+
+    const Notification = require('../model/notification');
+    const notification = new Notification({
+      user: employeeId,
+      message: `You have received a new performance review for ${period} with a rating of ${rating}/5.`,
+      companyId: req.user.companyId
+    });
+    await notification.save();
+
+    const populatedReview = await Review.findById(review._id)
+      .populate('employee', 'name email team')
+      .populate('reviewer', 'name');
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user.companyId.toString()).emit('new_review', populatedReview);
+      io.to(req.user.companyId.toString()).emit('new_notification', notification);
+    }
+
+    res.status(201).json(populatedReview);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

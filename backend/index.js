@@ -183,4 +183,7 @@ if (require.main === module) {
   });
 }
 
+// Start cron jobs
+require('./utils/cronJobs');
+
 module.exports = app;
