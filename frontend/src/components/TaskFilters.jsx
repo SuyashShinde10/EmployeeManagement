@@ -4,9 +4,9 @@ const TaskFilters = ({ filters, setFilters }) => {
   const statuses = ['All', 'Pending', 'Assigned', 'In Progress', 'Completed'];
 
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+    <div className="ts-task-filters-row" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
       {/* Status Pills */}
-      <div style={{ display: 'flex', gap: 4 }}>
+      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
         {statuses.map(s => (
           <button
             key={s}
@@ -20,7 +20,7 @@ const TaskFilters = ({ filters, setFilters }) => {
       </div>
 
       {/* Search */}
-      <div className="ts-search" style={{ marginLeft: 'auto' }}>
+      <div className="ts-search" style={{ marginLeft: 'auto', minWidth: 120, maxWidth: 220 }}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              strokeWidth="2.5" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>

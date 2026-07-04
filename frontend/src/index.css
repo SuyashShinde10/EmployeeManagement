@@ -198,6 +198,7 @@ body {
   text-decoration: none;
   cursor: pointer;
   flex: 1;
+  white-space: nowrap;
 }
 
 .ts-navbar-right {
@@ -324,8 +325,11 @@ body {
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 480px;
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,.15);
+  display: flex;
+  flex-direction: column;
 }
 
 .ts-modal-header {
@@ -344,6 +348,8 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .ts-close-btn {
@@ -427,6 +433,8 @@ body {
   color: var(--text);
   font-family: inherit;
   width: 140px;
+  min-width: 0;
+  flex: 1;
 }
 
 /* ─── Progress Bar ───────────────────────────────────────────────────── */
@@ -628,8 +636,16 @@ body { overflow-x: hidden; }
   /* Hero section padding */
   .ts-hero-section { padding: 40px 16px 40px !important; }
 
-  /* Modal max width */
-  .ts-modal { max-width: calc(100vw - 32px) !important; }
+  /* Modal: full-width with safe margins */
+  .ts-modal {
+    max-width: calc(100vw - 24px) !important;
+    border-radius: var(--radius) !important;
+  }
+  /* Modal footer: stack on small screens */
+  .ts-modal-footer {
+    flex-direction: column-reverse !important;
+  }
+  .ts-modal-footer .ts-btn { width: 100% !important; justify-content: center; }
 
   /* Page padding */
   .ts-page-container { padding: 16px 12px; }
@@ -667,4 +683,20 @@ body { overflow-x: hidden; }
   .ts-stats-grid { grid-template-columns: 1fr !important; }
   .ts-hero-h1 { font-size: 1.7rem !important; }
   .ts-navbar-brand { font-size: 0.9rem; }
+  .ts-page-container { padding: 12px 10px; }
+  .ts-btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+}
+
+/* ─── Hero Mockup: Hide on Mobile ────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ts-hero-mockup-hide { display: none !important; }
+}
+
+/* ─── Employee Table: Scrollable wrapper ────────────────────────────── */
+.ts-emp-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ts-emp-table-wrap .ts-table {
+  min-width: 480px;
 }

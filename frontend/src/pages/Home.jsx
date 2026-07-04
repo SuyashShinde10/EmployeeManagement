@@ -73,8 +73,8 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Right Hero Content: Realistic App Mockup */}
-          <div className="ts-surface" style={{
+          {/* Right Hero Content: Realistic App Mockup - hidden on mobile */}
+          <div className="ts-hero-mockup-hide ts-surface" style={{
             background: 'var(--surface)',
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',

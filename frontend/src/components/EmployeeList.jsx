@@ -47,11 +47,11 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
   return (
     <div className="ts-surface" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
         <span className="ts-section-title">Team Directory</span>
-        <div className="ts-search">
+        <div className="ts-search" style={{ flex: '0 1 200px', minWidth: 120 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               strokeWidth="2" style={{ color: 'var(--text-muted)' }}>
+               strokeWidth="2" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input
@@ -80,12 +80,13 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
 
       {/* Table */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="ts-emp-table-wrap">
         <table className="ts-table">
           <thead>
             <tr>
               <th style={{ paddingLeft: 20 }}>Name</th>
               <th>Department</th>
-              <th>Assigned Tasks</th>
+              <th className="ts-emp-col-hidden">Assigned Tasks</th>
               <th style={{ textAlign: 'right', paddingRight: 20 }}></th>
             </tr>
           </thead>
@@ -106,7 +107,7 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
                   <td>
                     <span className="ts-badge ts-badge-emp">{emp.team}</span>
                   </td>
-                  <td>
+                  <td className="ts-emp-col-hidden">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text)' }}>
                         {empTasks.length} {empTasks.length === 1 ? 'task' : 'tasks'}
@@ -115,9 +116,9 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
                           {empTasks.map(t => {
                             let statusColor = 'var(--text-muted)';
-                            if (t.status === 'In Progress') statusColor = '#eab308'; // Amber
-                            if (t.status === 'Completed') statusColor = '#10b981'; // Green
-                            if (t.status === 'Assigned') statusColor = '#3b82f6'; // Blue
+                            if (t.status === 'In Progress') statusColor = '#eab308';
+                            if (t.status === 'Completed') statusColor = '#10b981';
+                            if (t.status === 'Assigned') statusColor = '#3b82f6';
                             return (
                               <span key={t._id} style={{
                                 fontSize: '0.675rem',
@@ -176,6 +177,7 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {editingEmp && (

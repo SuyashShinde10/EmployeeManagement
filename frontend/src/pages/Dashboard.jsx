@@ -190,7 +190,7 @@ const Dashboard = () => {
 
         {/* Task Board */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div className="ts-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
               {role === 'PM' ? 'Task Board' : 'My Tasks'}
             </h2>
