@@ -11,12 +11,12 @@ const Home = () => {
       <Navbar />
 
       {/* HERO SECTION */}
-      <section style={{
+      <section className="ts-hero-section" style={{
         padding: '80px 24px 64px',
         borderBottom: '1px solid var(--border)',
         background: 'linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%)'
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
+        <div className="ts-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
           
           {/* Left Hero Content */}
           <div>
@@ -33,7 +33,7 @@ const Home = () => {
               v2.0 Security Release
             </div>
             
-            <h1 style={{
+            <h1 className="ts-hero-h1" style={{
               fontSize: '3rem',
               fontWeight: 800,
               letterSpacing: '-1.5px',
@@ -153,7 +153,7 @@ const Home = () => {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+          <div className="ts-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
             {/* Step 1 */}
             <div>
               <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--border-focus)', marginBottom: 12 }}>01</div>
@@ -200,7 +200,7 @@ const Home = () => {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="ts-features-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             <div style={{ display: 'flex', gap: 12 }}>
               <div style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</div>
               <div>

@@ -449,3 +449,222 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ─── Mobile Responsive Viewport ────────────────────────────────────── */
+html { overflow-x: hidden; }
+body { overflow-x: hidden; }
+
+/* ─── Responsive Navbar ──────────────────────────────────────────────── */
+.ts-navbar-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ts-navbar-menu-btn:hover { background: var(--surface-2); }
+
+.ts-mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+.ts-mobile-nav-overlay.open { display: block; }
+
+.ts-mobile-nav-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+
+.ts-mobile-nav-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--surface);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ts-mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ts-mobile-nav-body {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 4px;
+  flex: 1;
+}
+
+.ts-mobile-nav-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 11px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.ts-mobile-nav-link:hover { background: var(--surface-2); }
+.ts-mobile-nav-link.active { color: var(--accent); background: var(--accent-light); font-weight: 600; }
+.ts-mobile-nav-link.danger  { color: var(--danger); }
+.ts-mobile-nav-link.danger:hover { background: var(--danger-light); }
+
+.ts-mobile-nav-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.ts-mobile-user-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* ─── Search Input Full-Width on Mobile ─────────────────────────────── */
+.ts-search input { width: 100%; min-width: 0; }
+
+/* ─── Responsive Page Container ─────────────────────────────────────── */
+.ts-page-container {
+  padding: 20px 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ─── Media Query: Tablet & Below (≤ 900px) ─────────────────────────── */
+@media (max-width: 900px) {
+  /* Show hamburger, hide inline nav links */
+  .ts-navbar-menu-btn { display: flex; align-items: center; }
+  .ts-navbar-desktop-links { display: none !important; }
+  .ts-navbar-right { gap: 8px; }
+
+  /* Notification dropdown: constrain to viewport */
+  .ts-notif-dropdown {
+    right: 0;
+    width: min(300px, calc(100vw - 32px)) !important;
+  }
+
+  /* Dashboard password banner: stack on mobile */
+  .ts-temp-pw-banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* PM layout: collapse sidebar */
+  .ts-pm-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero section: single column */
+  .ts-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Features grid: 2 columns */
+  .ts-features-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Steps grid: single column */
+  .ts-steps-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  /* Analytics leaderboard + XP layout */
+  .ts-analytics-bottom-row {
+    flex-direction: column !important;
+  }
+}
+
+/* ─── Media Query: Mobile (≤ 600px) ─────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Navbar padding */
+  .ts-navbar { padding: 0 16px; }
+
+  /* Stat cards: 2 columns */
+  .ts-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Features grid: 1 column */
+  .ts-features-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero heading */
+  .ts-hero-h1 { font-size: 2rem !important; }
+
+  /* Hero section padding */
+  .ts-hero-section { padding: 40px 16px 40px !important; }
+
+  /* Modal max width */
+  .ts-modal { max-width: calc(100vw - 32px) !important; }
+
+  /* Page padding */
+  .ts-page-container { padding: 16px 12px; }
+
+  /* Tables: allow horizontal scroll */
+  .ts-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Analytics title size */
+  .ts-analytics-title { font-size: 1.25rem !important; }
+
+  /* Employee list table on mobile: compact */
+  .ts-emp-col-hidden { display: none; }
+
+  /* Section headers wrap */
+  .ts-section-header { flex-wrap: wrap; gap: 8px; }
+
+  /* Stat cards: always 2 col on tiny screens */
+  .ts-stats-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Task filters wrap */
+  .ts-task-filters-row { flex-wrap: wrap; gap: 8px; }
+
+  /* Shared task card: full width */
+  .ts-shared-task-card { flex: 0 0 calc(100vw - 80px) !important; }
+
+  /* Auth pages */
+  .ts-auth-surface { margin: 0 8px !important; }
+
+  /* Register form grid: single column */
+  .ts-reg-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Media Query: Very Small (≤ 380px) ─────────────────────────────── */
+@media (max-width: 380px) {
+  .ts-stats-grid { grid-template-columns: 1fr !important; }
+  .ts-hero-h1 { font-size: 1.7rem !important; }
+  .ts-navbar-brand { font-size: 0.9rem; }
+}

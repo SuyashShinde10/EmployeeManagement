@@ -59,21 +59,22 @@ const ActivityLog = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div className="ts-page-container" style={{ maxWidth: 960, margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
           <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text)' }}>Activity Log / Export</h1>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button className="ts-btn ts-btn-ghost" onClick={exportCSV}>
-              <Download size={16} style={{ marginRight: 8 }} /> Export CSV
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="ts-btn ts-btn-ghost ts-btn-sm" onClick={exportCSV}>
+              <Download size={16} style={{ marginRight: 6 }} /> Export CSV
             </button>
-            <button className="ts-btn ts-btn-primary" onClick={exportPDF}>
-              <Download size={16} style={{ marginRight: 8 }} /> Export PDF
+            <button className="ts-btn ts-btn-primary ts-btn-sm" onClick={exportPDF}>
+              <Download size={16} style={{ marginRight: 6 }} /> Export PDF
             </button>
           </div>
         </div>
 
         <div className="ts-surface" style={{ overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <div className="ts-table-wrap" style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 520 }}>
             <thead>
               <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: 'var(--text-subtle)' }}>Time</th>
@@ -111,6 +112,7 @@ const ActivityLog = () => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

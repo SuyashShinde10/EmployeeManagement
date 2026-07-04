@@ -176,10 +176,10 @@ const TaskDetails = () => {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 24px' }}>
+      <div className="ts-page-container" style={{ maxWidth: 960, margin: '0 auto' }}>
 
         {/* Back + Actions Row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           <button
             className="ts-btn ts-btn-ghost ts-btn-sm"
             onClick={() => navigate('/dashboard')}
@@ -208,7 +208,7 @@ const TaskDetails = () => {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 16, alignItems: 'start' }}>
+        <div className="ts-pm-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 16, alignItems: 'start' }}>
 
           {/* ─── Left Column ─────────────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

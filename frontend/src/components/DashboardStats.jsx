@@ -55,7 +55,7 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
   return (
     <div style={{ marginBottom: 32 }}>
       {/* Stat Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 16 }}>
+      <div className="ts-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 16 }}>
         {statConfig.map(({ label, key, accent }) => (
           <div key={key} className="ts-stat-card">
             <span className="ts-label">{label}</span>
@@ -178,7 +178,7 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
                 });
 
                 return (
-                  <div key={task._id} style={{
+                  <div key={task._id} className="ts-shared-task-card" style={{
                     flex: '0 0 340px',
                     scrollSnapAlign: 'start',
                     border: '1px solid var(--border)',

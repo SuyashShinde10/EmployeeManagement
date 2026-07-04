@@ -77,13 +77,13 @@ const Reviews = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 24px' }}>
+      <div className="ts-page-container" style={{ maxWidth: 960, margin: '0 auto' }}>
         <h1 style={{ margin: '0 0 24px', fontSize: '1.5rem', color: 'var(--text)' }}>Performance Reviews</h1>
         
         {role === 'PM' && (
           <div className="ts-surface" style={{ padding: 24, marginBottom: 24 }}>
             <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem' }}>Create New Review</h3>
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr 1fr' }} className="ts-reg-grid">
               <div>
                 <label className="ts-label">Employee</label>
                 <select className="ts-input" value={newReview.employeeId} onChange={e => setNewReview({...newReview, employeeId: e.target.value})} required>
@@ -121,7 +121,7 @@ const Reviews = () => {
             ) : (
               reviews.map(rev => (
                 <div key={rev._id} className="ts-surface" style={{ padding: 20 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                     <div>
                       <h4 style={{ margin: '0 0 4px' }}>{role === 'PM' ? rev.employee?.name : 'My Review'} - {rev.period}</h4>
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-subtle)' }}>Reviewed by {rev.reviewer?.name}</span>

@@ -67,9 +67,9 @@ const CalendarView = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 24px' }}>
+      <div className="ts-page-container" style={{ maxWidth: 1000, margin: '0 auto' }}>
         <h1 style={{ margin: '0 0 24px', fontSize: '1.5rem', color: 'var(--text)' }}>Task Calendar</h1>
-        <div className="ts-surface" style={{ padding: 24, height: '70vh' }}>
+        <div className="ts-surface" style={{ padding: '16px', minHeight: 500 }}>
           <Calendar
             localizer={localizer}
             events={events}
@@ -77,6 +77,7 @@ const CalendarView = () => {
             endAccessor="end"
             eventPropGetter={eventStyleGetter}
             onSelectEvent={(event) => navigate(`/task/${event.resource._id}`)}
+            style={{ height: 'clamp(400px, 65vh, 700px)' }}
           />
         </div>
       </div>

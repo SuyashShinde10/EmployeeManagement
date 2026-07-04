@@ -31,15 +31,15 @@ const Directory = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div className="ts-page-container" style={{ maxWidth: 960, margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
           <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text)' }}>Company Directory</h1>
           <input 
             className="ts-input"
             placeholder="Search by name, email, or team..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 300 }}
+            style={{ width: '100%', maxWidth: 300 }}
           />
         </div>
 

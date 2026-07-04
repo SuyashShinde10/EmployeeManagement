@@ -120,11 +120,11 @@ const Dashboard = () => {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
 
-      <div style={{ padding: '28px 32px', maxWidth: 1400, margin: '0 auto' }}>
+      <div className="ts-page-container" style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 20px' }}>
         
         {/* Password Warning Banner */}
         {isPasswordTemp && (
-          <div style={{
+          <div className="ts-temp-pw-banner" style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -177,7 +177,7 @@ const Dashboard = () => {
 
         {/* PM Management Section */}
         {role === 'PM' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, marginBottom: 28 }}>
+          <div className="ts-pm-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, marginBottom: 28 }}>
             {/* Left sidebar: forms */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <CreateEmployee onSuccess={refreshData} />

@@ -202,7 +202,7 @@ const Analytics = () => {
           marginBottom: 24
         }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
+            <h1 className="ts-analytics-title" style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
               {role === 'PM' ? 'Team Performance Analytics' : 'My Performance Analytics'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '4px 0 0' }}>
@@ -298,11 +298,12 @@ const Analytics = () => {
             </div>
 
             {/* Leaderboard & XP Rules Layout */}
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
               {/* Leaderboard Table */}
               <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', flex: '1 1 650px', margin: 0 }}>
               <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Employee Performance Leaderboard</h3>
               
+              <div className="ts-table-wrap" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 600 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700 }}>
@@ -387,6 +388,7 @@ const Analytics = () => {
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
             {renderXPRulesCard()}
           </div>
@@ -458,7 +460,7 @@ const Analytics = () => {
             )}
 
             {/* Trend Chart & XP Rules Layout */}
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
               {/* SVG Trend Chart Card */}
               <div className="ts-surface" style={{ padding: 24, flex: '1 1 650px', margin: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
