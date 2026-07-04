@@ -300,20 +300,20 @@ const Analytics = () => {
             {/* Leaderboard & XP Rules Layout */}
             <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
               {/* Leaderboard Table */}
-              <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', flex: '1 1 650px', margin: 0 }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Employee Performance Leaderboard</h3>
+              <div className="ts-surface" style={{ flex: '1 1 300px', margin: 0, minWidth: 0, overflow: 'hidden' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, padding: '20px 20px 16px' }}>Employee Performance Leaderboard</h3>
               
-              <div className="ts-table-wrap" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 600 }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 640 }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700 }}>
-                    <th style={{ padding: '12px 8px' }}>RANK</th>
-                    <th style={{ padding: '12px 8px' }}>EMPLOYEE</th>
-                    <th style={{ padding: '12px 8px' }}>TASKS ASSIGNED</th>
-                    <th style={{ padding: '12px 8px' }}>TASKS DONE</th>
-                    <th style={{ padding: '12px 8px' }}>AVG. SPEED</th>
-                    <th style={{ padding: '12px 8px' }}>ON-TIME RATE</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'right' }}>TOTAL XP</th>
+                  <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <th style={{ padding: '10px 8px 10px 20px', whiteSpace: 'nowrap' }}>RANK</th>
+                    <th style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>EMPLOYEE</th>
+                    <th style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>ASSIGNED</th>
+                    <th style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>DONE</th>
+                    <th style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>AVG SPEED</th>
+                    <th style={{ padding: '10px 8px', whiteSpace: 'nowrap' }}>ON-TIME</th>
+                    <th style={{ padding: '10px 20px 10px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>XP</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -331,47 +331,48 @@ const Analytics = () => {
 
                     return (
                       <tr key={emp._id} style={{ borderBottom: '1px solid var(--border)', fontSize: '0.875rem' }} className="ts-table-row">
-                        <td style={{ padding: '14px 8px', fontWeight: 700, color: index === 0 ? 'var(--accent)' : 'var(--text)' }}>
+                        <td style={{ padding: '12px 8px 12px 20px', fontWeight: 700, color: index === 0 ? 'var(--accent)' : 'var(--text)' }}>
                           #{index + 1}
                         </td>
-                        <td style={{ padding: '14px 8px' }}>
-                          <div style={{ fontWeight: 600 }}>{emp.name}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{emp.email}</div>
+                        <td style={{ padding: '12px 8px' }}>
+                          <div style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{emp.name}</div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{emp.email}</div>
                         </td>
-                        <td style={{ padding: '14px 8px' }}>
+                        <td style={{ padding: '12px 8px' }}>
                           <div style={{ fontWeight: 600, color: 'var(--text)' }}>{emp.assignedCount}</div>
-                          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
-                            <span className="ts-badge ts-badge-success" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                              {emp.assignedIndividualCount || 0} Indiv
+                          <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
+                            <span style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '1px 5px', fontSize: '0.6rem', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+                              {emp.assignedIndividualCount || 0}I
                             </span>
-                            <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                              {emp.assignedTeamCount || 0} Team
+                            <span style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '1px 5px', fontSize: '0.6rem', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+                              {emp.assignedTeamCount || 0}T
                             </span>
                           </div>
                         </td>
-                        <td style={{ padding: '14px 8px' }}>
+                        <td style={{ padding: '12px 8px' }}>
                           <div style={{ fontWeight: 700, color: 'var(--success)' }}>{emp.completedCount}</div>
-                          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
-                            <span className="ts-badge ts-badge-success" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                              {emp.completedIndividualCount || 0} Indiv
+                          <div style={{ display: 'flex', gap: 3, marginTop: 3 }}>
+                            <span style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '1px 5px', fontSize: '0.6rem', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+                              {emp.completedIndividualCount || 0}I
                             </span>
-                            <span className="ts-badge ts-badge-assigned" style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '2px 6px', fontSize: '0.65rem', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                              {emp.completedTeamCount || 0} Team
+                            <span style={{ background: 'var(--accent-light)', color: 'var(--accent)', padding: '1px 5px', fontSize: '0.6rem', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+                              {emp.completedTeamCount || 0}T
                             </span>
                           </div>
                         </td>
-                        <td style={{ padding: '14px 8px' }}>
+                        <td style={{ padding: '12px 8px', whiteSpace: 'nowrap' }}>
                           {emp.completedCount > 0 ? formatSpeed(emp.avgSpeedHours) : '--'}
                         </td>
-                        <td style={{ padding: '14px 8px', fontWeight: 600 }}>{emp.onTimeRate}%</td>
-                        <td style={{ padding: '14px 8px', textAlign: 'right' }}>
+                        <td style={{ padding: '12px 8px', fontWeight: 600, whiteSpace: 'nowrap' }}>{emp.onTimeRate}%</td>
+                        <td style={{ padding: '12px 20px 12px 8px', textAlign: 'right' }}>
                           <span style={{
                             padding: '4px 10px',
                             borderRadius: 'var(--radius)',
                             fontSize: '0.75rem',
                             fontWeight: 700,
                             color: scoreBadgeColor,
-                            background: scoreBadgeBg
+                            background: scoreBadgeBg,
+                            whiteSpace: 'nowrap'
                           }}>
                             {xpVal} XP
                           </span>
