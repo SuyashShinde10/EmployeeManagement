@@ -70,8 +70,8 @@ const DashboardStats = ({ tasks = [], filteredTasks = [], role = 'PM' }) => {
           <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
             <span className="ts-section-title">Team Performance</span>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table className="ts-table">
+          <div className="ts-table-wrap" style={{ overflowX: 'auto' }}>
+            <table className="ts-table" style={{ minWidth: 500 }}>
               <thead>
                 <tr>
                   <th>Department</th>
