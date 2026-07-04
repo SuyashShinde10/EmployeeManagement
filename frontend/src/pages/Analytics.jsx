@@ -154,7 +154,7 @@ const Analytics = () => {
 
   const renderXPRulesCard = () => {
     return (
-      <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', height: 'fit-content', border: '1px solid var(--border)' }}>
+      <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', height: 'fit-content', border: '1px solid var(--border)', minWidth: 0 }}>
         <h4 style={{ margin: '0 0 12px', fontSize: '1rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
           🏆 XP Scoring Guide
         </h4>
@@ -246,7 +246,7 @@ const Analytics = () => {
 
         {/* ─── PM VIEW ─────────────────────────────────────────────────────────── */}
         {role === 'PM' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
             {/* KPI Summary Cards */}
             <div style={{
               display: 'grid',
@@ -280,10 +280,10 @@ const Analytics = () => {
             </div>
 
             {/* Visual Trend Chart Card */}
-            <div className="ts-surface" style={{ padding: 24 }}>
+            <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', minWidth: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Task Activity Trend</h3>
-                <div style={{ display: 'flex', gap: 16, fontSize: '0.8rem' }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: '0.8rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{ width: 12, height: 4, background: 'var(--accent)', borderRadius: 2 }} />
                     <span style={{ color: 'var(--text-muted)' }}>Created</span>
@@ -398,7 +398,7 @@ const Analytics = () => {
 
         {/* ─── EMPLOYEE VIEW ───────────────────────────────────────────────────── */}
         {role === 'Employee' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
             {/* Summary metrics row */}
             <div style={{
               display: 'grid',
@@ -463,8 +463,8 @@ const Analytics = () => {
             {/* Trend Chart & XP Rules Layout */}
             <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
               {/* SVG Trend Chart Card */}
-              <div className="ts-surface" style={{ padding: 24, flex: '1 1 650px', margin: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', margin: 0, minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                   <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>My Completion Output</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}>
                     <span style={{ width: 12, height: 4, background: 'var(--success)', borderRadius: 2 }} />
