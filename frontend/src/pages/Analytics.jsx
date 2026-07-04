@@ -154,7 +154,7 @@ const Analytics = () => {
 
   const renderXPRulesCard = () => {
     return (
-      <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', height: 'fit-content', border: '1px solid var(--border)', minWidth: 0 }}>
+      <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', height: 'fit-content', border: '1px solid var(--border)', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
         <h4 style={{ margin: '0 0 12px', fontSize: '1rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
           🏆 XP Scoring Guide
         </h4>
@@ -191,7 +191,7 @@ const Analytics = () => {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
       <Navbar />
 
-      <main className="ts-container" style={{ padding: '24px 16px', maxWidth: 1200, margin: '0 auto' }}>
+      <main className="ts-container" style={{ padding: '24px 16px', maxWidth: 1200, margin: '0 auto', width: '100%', overflowX: 'hidden' }}>
         {/* Title & Controls Header */}
         <div style={{
           display: 'flex',
@@ -280,7 +280,7 @@ const Analytics = () => {
             </div>
 
             {/* Visual Trend Chart Card */}
-            <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', minWidth: 0 }}>
+            <div className="ts-surface" style={{ padding: 24, overflowX: 'auto', minWidth: 0, maxWidth: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Task Activity Trend</h3>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: '0.8rem' }}>
@@ -300,7 +300,7 @@ const Analytics = () => {
             {/* Leaderboard & XP Rules Layout */}
             <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', width: '100%' }}>
               {/* Leaderboard Table */}
-              <div className="ts-surface" style={{ flex: '1 1 300px', margin: 0, minWidth: 0, overflow: 'hidden' }}>
+              <div className="ts-surface" style={{ flex: '1 1 300px', margin: 0, minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, padding: '20px 20px 16px' }}>Employee Performance Leaderboard</h3>
               
               <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -463,7 +463,7 @@ const Analytics = () => {
             {/* Trend Chart & XP Rules Layout */}
             <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', width: '100%' }}>
               {/* SVG Trend Chart Card */}
-              <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', margin: 0, minWidth: 0 }}>
+              <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', margin: 0, minWidth: 0, maxWidth: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                   <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>My Completion Output</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}>
