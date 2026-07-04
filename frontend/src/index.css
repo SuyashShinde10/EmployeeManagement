@@ -611,6 +611,7 @@ body { overflow-x: hidden; }
   /* Analytics leaderboard + XP layout */
   .ts-analytics-bottom-row {
     flex-direction: column !important;
+    align-items: stretch !important;
   }
 }
 

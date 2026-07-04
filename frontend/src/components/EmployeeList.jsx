@@ -170,7 +170,7 @@ const EmployeeList = ({ refreshTrigger, tasks = [] }) => {
             })}
             {display.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                <td colSpan={4} style={{ textAlign: 'left', padding: '32px 20px', color: 'var(--text-muted)' }}>
                   No employees found.
                 </td>
               </tr>

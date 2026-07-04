@@ -382,7 +382,7 @@ const Analytics = () => {
                   })}
                   {leaderboard.length === 0 && (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                      <td colSpan="7" style={{ textAlign: 'left', padding: '24px 20px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                         No employees found in this timeframe.
                       </td>
                     </tr>
