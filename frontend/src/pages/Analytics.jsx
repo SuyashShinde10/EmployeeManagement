@@ -158,7 +158,7 @@ const Analytics = () => {
         <h4 style={{ margin: '0 0 12px', fontSize: '1rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
           🏆 XP Scoring Guide
         </h4>
-        <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+        <p style={{ margin: '0 0 16px', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.4', whiteSpace: 'normal', wordWrap: 'break-word' }}>
           Rankings are calculated dynamically based on task contributions and timeline compliance:
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -298,7 +298,7 @@ const Analytics = () => {
             </div>
 
             {/* Leaderboard & XP Rules Layout */}
-            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', width: '100%' }}>
               {/* Leaderboard Table */}
               <div className="ts-surface" style={{ flex: '1 1 300px', margin: 0, minWidth: 0, overflow: 'hidden' }}>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, padding: '20px 20px 16px' }}>Employee Performance Leaderboard</h3>
@@ -461,7 +461,7 @@ const Analytics = () => {
             )}
 
             {/* Trend Chart & XP Rules Layout */}
-            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', width: '100%' }}>
+            <div className="ts-analytics-bottom-row" style={{ display: 'flex', flexDirection: 'row', gap: 24, flexWrap: 'wrap', width: '100%' }}>
               {/* SVG Trend Chart Card */}
               <div className="ts-surface" style={{ padding: 24, flex: '1 1 300px', margin: 0, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
